@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+    <h1 data-i18n="timer_title">Focus Timer</h1>
+</div>
+
+<div class="timer-layout">
+    
+    <div class="card settings-sidebar">
+        
+        <div class="form-group">
+            <label for="habitSelect" data-i18n="select_habit_label">Target Habit</label>
+            <select class="habit-select" id="habitSelect" required>
+                <option value="" disabled selected data-i18n="select_habit">Select a habit...</option>
+                <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
+                    <% habits.forEach(habit => { %>
+                        <option value="<%= habit.id %>"><%= habit.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="workTime" data-i18n="work_label">Focus Session (Minutes)</label>
+            <input type="number" id="workTime" value="25" min="1" max="60" placeholder="e.g. 25">
+        </div>
+        
+        <div class="form-group">
+            <label for="breakTime" data-i18n="break_label">Break Session (Minutes)</label>
+            <input type="number" id="breakTime" value="5" min="1" max="60" placeholder="e.g. 5">
+        </div>
+        
+        <div class="form-group">
+            <label for="sessions" data-i18n="sessions_label">Total Target Rounds</label>
+            <input type="number" id="sessions" value="4" min="1" max="10" placeholder="e.g. 4">
+        </div>
+    </div>
+
+    <div class="card timer-display-pane">
+        <h3 id="sessionStatus" data-i18n="status_ready">Ready to Focus</h3>
+        
+        <div class="circle-container">
+            <svg class="timer-svg" viewBox="0 0 200 200">
+                <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
+                <circle class="ring-progress stage-green" id="progressRing" cx="100" cy="100" r="90"></circle>
+            </svg>
+            <div class="clock-display" id="timeDisplay">25:00</div>
+        </div>
+
+        <div class="timer-controls">
+            <button class="btn btn-primary" id="startBtn" data-i18n="btn_start">Start</button>
+            <button class="btn btn-danger" id="resetBtn" data-i18n="btn_reset">Reset</button>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

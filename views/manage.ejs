@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+    <h1 data-i18n="manage_title">Manage Habits</h1>
+</div>
+
+<div class="card">
+    <form class="habit-form" action="/api/habits" method="POST">
+        
+        <div class="form-group">
+            <label for="habitNameField" data-i18n="habit_name">Habit Name</label>
+            <input type="text" id="habitNameField" name="name" placeholder="e.g. Morning Workout" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="habitTimeField" data-i18n="req_time">Required Time (Hours)</label>
+            <input type="number" id="habitTimeField" name="requiredTime" min="1" placeholder="e.g. 40" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="habitScheduleField" data-i18n="schedule">Schedule (Optional)</label>
+            <input type="datetime-local" id="habitScheduleField" name="schedule">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" data-i18n="add_habit">Add Habit</button>
+    </form>
+</div>
+
+<%- include('partials/footer') %>

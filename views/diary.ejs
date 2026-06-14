@@ -1,0 +1,65 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+    <h1 data-i18n="diary_title">My Diary Wall</h1>
+</div>
+
+<div class="card create-post">
+    <form action="/api/diary" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="diaryHabitSelect" style="display:block; font-weight:600; margin-bottom:5px;">Link to Habit (Optional)</label>
+            <select name="habitTagged" id="diaryHabitSelect">
+                <option value="" selected>General Achievement / Un-tagged</option>
+                <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
+                    <% habits.forEach(habit => { %>
+                        <option value="<%= habit.id %>"><%= habit.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <textarea name="content" placeholder="What did you achieve today?" rows="3" required></textarea>
+        </div>
+
+        <div class="post-actions">
+            <input type="file" name="postImage" accept="image/*" id="fileUpload">
+            <button type="submit" class="btn btn-primary" data-i18n="btn_post">Post</button>
+        </div>
+    </form>
+</div>
+
+<div class="feed">
+    <% if (typeof posts !== 'undefined' && posts.length > 0) { %>
+        <% posts.forEach(post => { %>
+            <div class="card post">
+                <div class="post-header">
+                    <strong><%= post.date %></strong>
+                    <span><%= post.time %></span>
+                </div>
+                
+                <% if (post.habitName) { %>
+                    <span class="badge-tag" style="background-color: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-bottom: 10px;">
+                        🎯 <%= post.habitName %>
+                    </span>
+                <% } %>
+
+                <p><%= post.content %></p>
+                
+                <% if (post.imageUrl) { %>
+                    <div class="post-image-container" style="margin-top:15px; border-radius:6px; overflow:hidden;">
+                        <img src="<%= post.imageUrl %>" alt="Post Achievement Image" style="width:100%; height:auto; display:block;">
+                    </div>
+                <% } %>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <div class="card empty-state-card" style="text-align: center; border: 2px dashed var(--border); background: transparent; box-shadow: none;">
+            <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">✍️</div>
+            <h3>Your memory wall is empty</h3>
+            <p style="color: var(--text-muted);">Document your daily progression steps. Log updates above to populate your profile feed history.</p>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

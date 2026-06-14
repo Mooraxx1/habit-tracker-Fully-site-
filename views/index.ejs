@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+    <h1 data-i18n="dashboard_title">Activity Overview</h1>
+</div>
+
+<div class="card graph-card">
+    <h3 data-i18n="activity_graph">365-Day Activity</h3>
+    <div id="activityGraph" class="activity-grid"></div>
+</div>
+
+<div id="habitsContainer" class="stats-grid">
+    <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
+        <% habits.forEach(habit => { %>
+            <% 
+               // Protection barrier against dividing by zero if requiredTime is missing
+               let safeRequiredTime = habit.requiredTime || 1;
+               let percentage = Math.min(Math.round((habit.completedTime / safeRequiredTime) * 100), 100); 
+            %>
+            <div class="stat-card habit-item">
+                <div class="circle" style="--percentage: <%= percentage %>%;">
+                    <span><%= percentage %>%</span>
+                </div>
+                <h3><%= habit.name %></h3>
+                <p><%= habit.completedTime.toFixed(1) %> hrs / <%= safeRequiredTime %> hrs total</p>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <div id="noHabitsMessage" class="card empty-state-card">
+            <div class="empty-icon">📊</div>
+            <h3 data-i18n="empty_habits_title">Here you will see and track your habits</h3>
+            <p data-i18n="empty_habits_desc">Go to the "Manage" tab to add your first habit and start tracking your progress!</p>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,452 @@
+/* ==========================================================================
+   1. COLOR PALETTE & THEMES
+   ========================================================================== */
+:root {
+    --bg-color: #f4f7f6;
+    --nav-bg: #ffffff;
+    --card-bg: #ffffff;
+    --text-main: #2d3748;
+    --text-muted: #718096;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --danger: #e53e3e;
+    --border: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a202c;
+    --nav-bg: #2d3748;
+    --card-bg: #2d3748;
+    --text-main: #f7fafc;
+    --text-muted: #a0aec0;
+    --border: #4a5568;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   2. CORE LAYOUT STRUCTURE & STICKY FOOTER
+   ========================================================================== */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-family);
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.site-wrapper {
+    flex: 1 0 auto; /* Expands content to push footer down */
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* RTL (Arabic) Font Override */
+[dir="rtl"] {
+    font-family: 'Tajawal', 'Segoe UI', sans-serif;
+}
+
+/* ==========================================================================
+   3. NAVBAR
+   ========================================================================== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--nav-bg);
+    padding: 1rem 2rem;
+    box-shadow: var(--shadow);
+}
+
+.nav-links a {
+    color: var(--text-main);
+    text-decoration: none;
+    margin: 0 1rem;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: var(--primary);
+}
+
+/* ==========================================================================
+   4. UI CARDS, FORMS & BUTTONS
+   ========================================================================== */
+.card {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+.btn-primary { background-color: var(--primary); }
+.btn-primary:hover { background-color: var(--primary-hover); }
+.btn-danger { background-color: var(--danger); }
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-main);
+    margin-left: 10px;
+}
+
+/* ==========================================================================
+   5. 365 ACTIVITY GRAPH (GITHUB TRACKER)
+   ========================================================================== */
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(52, 1fr);
+    gap: 3px;
+    margin-top: 1rem;
+    overflow-x: auto;
+}
+
+.activity-block {
+    width: 12px;
+    height: 12px;
+    background-color: var(--border);
+    border-radius: 2px;
+    transition: background-color 0.8s ease, transform 0.3s ease;
+}
+
+.activity-block.pulse-glow {
+    transform: scale(1.15);
+}
+
+/* Intensity Colors */
+.activity-block[data-level="1"] { background-color: #9be9a8; }
+.activity-block[data-level="2"] { background-color: #40c463; }
+.activity-block[data-level="3"] { background-color: #30a14e; }
+.activity-block[data-level="4"] { background-color: #216e39; }
+
+/* ==========================================================================
+   6. PROGRESS PERCENTAGE CIRCLES & DASHBOARD
+   ========================================================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: conic-gradient(var(--primary) var(--percentage), var(--border) 0);
+}
+
+.circle span {
+    background-color: var(--card-bg);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Empty Dashboard State Card */
+.empty-state-card {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    border: 2px dashed var(--border);
+    background: transparent;
+    box-shadow: none;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state-card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.empty-state-card p {
+    color: var(--text-muted);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   7. POMODORO TIMER LAYOUT & SVG CIRCLE
+   ========================================================================== */
+.timer-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .timer-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.settings-sidebar label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+}
+
+.timer-display-pane {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+}
+
+#sessionStatus {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.pomodoro-settings {
+    display: flex;
+    gap: 10px;
+    margin: 1.5rem 0;
+}
+
+/* SVG Countdown Perimeter */
+.circle-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin-bottom: 2rem;
+}
+
+.timer-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.timer-svg circle {
+    fill: transparent;
+    stroke-width: 8px;
+}
+
+.ring-bg {
+    stroke: var(--border);
+}
+
+.ring-progress {
+    stroke-dasharray: 565.48;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+}
+
+/* Timer Countdown States */
+.stage-green  { stroke: #10b981; }
+.stage-orange { stroke: #f59e0b; }
+.stage-red    { stroke: #ef4444; }
+.stage-break  { stroke: #3b82f6; }
+
+.clock-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3.5rem;
+    font-family: monospace;
+    font-weight: 700;
+    margin: 0;
+    color: var(--primary);
+}
+
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* ==========================================================================
+   8. DIARY FEED
+   ========================================================================== */
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.post-image-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: var(--bg-color);
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    border-radius: 6px;
+}
+
+/* ==========================================================================
+   9. MAIN SITE FOOTER
+   ========================================================================== */
+.main-footer {
+    flex-shrink: 0;
+    width: 100%;
+    text-align: center;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    background-color: var(--nav-bg);
+    box-shadow: var(--shadow);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-footer p {
+    margin: 0;
+    padding: 0;
+}
+
+.main-footer strong {
+    color: var(--primary);
+}
+
+/* ==========================================================================
+   10. PERSISTENT MINI OVERLAY TIMER STYLES
+   ========================================================================== */
+.mini-timer-bar {
+    position: fixed;
+    bottom: 50px; /* Sits perfectly right above your main site footer */
+    left: 0;
+    width: 100%;
+    background-color: var(--nav-bg);
+    border-top: 2px solid var(--primary);
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
+    padding: 0.75rem 2rem;
+    z-index: 9999;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+/* Slide animation states toggled via script classes */
+.hidden-overlay {
+    transform: translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mini-timer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mini-status-block {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+
+.mini-status-block #miniSessionStatus {
+    font-weight: 500;
+}
+
+.mini-divider {
+    margin: 0 10px;
+    color: var(--border);
+}
+
+.mini-status-block #miniTimeDisplay {
+    font-family: monospace;
+    font-size: 1.4rem;
+    color: var(--primary);
+}
+
+.mini-controls-block {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-small {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+}
+
+/* Padding fix to prevent page elements from getting trapped under the floating bar when scrolling */
+body {
+    padding-bottom: 60px; 
+}
