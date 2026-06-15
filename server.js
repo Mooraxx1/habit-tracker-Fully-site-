@@ -265,7 +265,6 @@ app.get("/manage", isAuthenticated, async (req, res) => {
   }
 });
 
-// FIXED: Added missing Timer view route
 app.get("/timer", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
@@ -277,7 +276,6 @@ app.get("/timer", isAuthenticated, async (req, res) => {
   }
 });
 
-// FIXED: Added missing Diary view route
 app.get("/diary", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
@@ -285,6 +283,18 @@ app.get("/diary", isAuthenticated, async (req, res) => {
     res.render("diary", { title: "My Diary Wall", posts: user.posts });
   } catch (err) {
     console.error("[Diary Router]: Error:", err.message);
+    res.redirect("/");
+  }
+});
+
+// FIXED: Added missing Profile Settings view route
+app.get("/profile/settings", isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.redirect("/auth/logout");
+    res.render("settings", { title: "Account Settings", user: user });
+  } catch (err) {
+    console.error("[Settings Router]: Error:", err.message);
     res.redirect("/");
   }
 });
