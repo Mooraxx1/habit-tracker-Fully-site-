@@ -6,7 +6,7 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const MongoStore = require("connect-mongo")(session);
+const MongoStore = require("connect-mongo"); // Modern v5+ syntax
 const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 
@@ -30,15 +30,15 @@ mongoose
   .catch((err) => console.error("Database connection error:", err));
 
 // ==========================================================================
-// 3. PERSISTENT SESSION MIDDLEWARE (STORED IN MONGODB)
+// 3. PERSISTENT SESSION MIDDLEWARE (MODERN CONNECT-MONGO SYNTAX)
 // ==========================================================================
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "devmoor_secret_key",
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({
-      url: MONGO_URI,
+    store: MongoStore.create({
+      mongoUrl: MONGO_URI, // Correct property for connect-mongo v5+
       collectionName: "sessions",
     }),
     cookie: {
@@ -53,16 +53,19 @@ function isAuthenticated(req, res, next) {
 }
 
 // ==========================================================================
-// 4. AUTHENTICATION ROUTES (NORMALIZED TO LOWERCASE)
+// 4. AUTHENTICATION ROUTES (CASE-INSENSITIVE & DYNAMIC ERRORS)
 // ==========================================================================
 app.post("/auth/register", async (req, res) => {
   try {
     const { username, password } = req.body;
-    // Normalize username to lowercase to prevent authentication mismatches
     const cleanUsername = username.trim().toLowerCase();
 
     const existingUser = await User.findOne({ username: cleanUsername });
-    if (existingUser) return res.send("Username taken. Please go back.");
+    if (existingUser) {
+      return res.render("register", {
+        error: "Username is already taken. Please choose another.",
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -72,27 +75,40 @@ app.post("/auth/register", async (req, res) => {
       posts: [],
     });
     await newUser.save();
+
+    // Pass a success flag to the login page if you want, or just redirect
     res.redirect("/login");
   } catch (err) {
-    res.status(500).send("Registration error.");
+    res.render("register", {
+      error: "System error during registration: " + err.message,
+    });
   }
 });
 
 app.post("/auth/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    // Normalize login input to lowercase match
     const cleanUsername = username.trim().toLowerCase();
 
     const user = await User.findOne({ username: cleanUsername });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.send("Authentication Failed. <a href='/login'>Try Again</a>");
+
+    if (!user) {
+      return res.render("login", {
+        error: "User not found. Please check your username.",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.render("login", {
+        error: "Incorrect password. Please try again.",
+      });
     }
 
     req.session.userId = user._id.toString();
     res.redirect("/");
   } catch (err) {
-    res.status(500).send("Login error.");
+    res.render("login", { error: "System error during login: " + err.message });
   }
 });
 
@@ -100,17 +116,26 @@ app.post("/auth/login", async (req, res) => {
 // 5. APPLICATION LOGIC & API ENDPOINTS
 // ==========================================================================
 app.get("/", isAuthenticated, async (req, res) => {
-  const user = await User.findById(req.session.userId);
-  res.render("index", {
-    title: "Dashboard",
-    habits: user.habits,
-    posts: user.posts,
-  });
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.redirect("/auth/logout");
+    res.render("index", {
+      title: "Dashboard",
+      habits: user.habits,
+      posts: user.posts,
+    });
+  } catch (err) {
+    res.redirect("/login");
+  }
 });
 
 app.get("/manage", isAuthenticated, async (req, res) => {
-  const user = await User.findById(req.session.userId);
-  res.render("manage", { title: "Manage Habits", habits: user.habits });
+  try {
+    const user = await User.findById(req.session.userId);
+    res.render("manage", { title: "Manage Habits", habits: user.habits });
+  } catch (err) {
+    res.redirect("/");
+  }
 });
 
 app.post("/api/habits", isAuthenticated, async (req, res) => {
@@ -151,6 +176,8 @@ app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
       );
       await user.save();
       res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, message: "Habit not found" });
     }
   } catch (err) {
     res.status(500).json({ success: false });
@@ -160,9 +187,11 @@ app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
 // ==========================================================================
 // 6. UTILITY ROUTES
 // ==========================================================================
-app.get("/login", (req, res) => res.render("login", { title: "Login" }));
+app.get("/login", (req, res) =>
+  res.render("login", { title: "Login", error: null }),
+);
 app.get("/register", (req, res) =>
-  res.render("register", { title: "Register" }),
+  res.render("register", { title: "Register", error: null }),
 );
 app.get("/auth/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
