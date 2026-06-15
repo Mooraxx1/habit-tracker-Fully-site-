@@ -1,54 +1,54 @@
 <%- include('partials/header') %>
 
-<div class="page-header">
-    <h1 data-i18n="dashboard_title">Activity Overview</h1>
+<div class="page-header" style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);" data-i18n="dashboard_title">Activity Overview</h1>
 </div>
 
-<div class="card" id="activityTrackerCard">
-    <h3 style="margin-bottom: 1rem; color: var(--text-main);" data-i18n="activity_graph">365-Day Activity</h3>
+<div class="card" id="activityTrackerCard" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 700;" data-i18n="activity_graph">365-Day Activity</h3>
     <div class="activity-grid-wrapper">
         <div class="activity-grid" id="activityGraph" data-posts='<%= JSON.stringify(posts || []) %>'>
-            </div>
+        </div>
     </div>
 </div>
 
-<div class="stats-grid" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>'>
-    <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
+<div class="stats-grid" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>' style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+    <% if (typeof habits !== 'undefined' && habits && habits.length > 0) { %>
         <% habits.forEach(habit => { %>
             <% 
                let safeRequired = habit.requiredTime || 1;
                let percentage = Math.min(Math.round((habit.completedTime / safeRequired) * 100), 100); 
             %>
-            <div class="stat-card">
-                <div class="circle" style="--percentage: <%= percentage %>%;">
-                    <span><%= percentage %>%</span>
+            <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center; box-shadow: var(--shadow);">
+                <div class="circle" style="--percentage: <%= percentage %>%; width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; background: conic-gradient(var(--primary) var(--percentage), var(--border) 0);">
+                    <span style="background-color: var(--card-bg); color: var(--text-main); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><%= percentage %>%</span>
                 </div>
-                <h4 style="color: var(--text-main); margin-bottom: 0.25rem;"><%= habit.name %></h4>
+                <h4 style="color: var(--text-main); margin-bottom: 0.25rem; font-weight: 700; font-size: 1.1rem;"><%= habit.name %></h4>
                 <p style="color: var(--text-muted); font-size: 0.85rem;">Daily Progress Map</p>
             </div>
         <% }) %>
     <% } else { %>
-        <div class="card empty-state-card" style="grid-column: 1 / -1; width: 100%;">
-            <div class="empty-icon">🌱</div>
-            <h3 data-i18n="empty_habits_title">Here you will see and track your habits</h3>
-            <p data-i18n="empty_habits_desc">Go to the "Manage" tab to add your first habit and start tracking your progress!</p>
+        <div class="card empty-state-card" style="grid-column: 1 / -1; width: 100%; text-align: center; border: 2px dashed var(--border); background: transparent; box-shadow: none; padding: 4rem 2rem; border-radius: 12px;">
+            <div class="empty-icon" style="font-size: 3.5rem; margin-bottom: 1rem;">🌱</div>
+            <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;" data-i18n="empty_habits_title">Here you will see and track your habits</h3>
+            <p style="color: var(--text-muted); max-width: 440px; margin: 0 auto; font-size: 0.95rem; line-height: 1.4;" data-i18n="empty_habits_desc">Go to the "Manage" tab to add your first habit and start tracking your progress!</p>
         </div>
     <% } %>
 </div>
 
-<div class="card" style="margin-top: 2rem; border: 1px solid var(--border); background-color: var(--card-bg); box-shadow: var(--shadow);">
+<div class="card" style="margin-top: 2rem; border: 1px solid var(--border); background-color: var(--card-bg); box-shadow: var(--shadow); padding: 1.5rem; border-radius: 12px;">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h3 style="color: var(--text-main); font-weight: 800;">Summary of Achievement</h3>
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Review logged focus times by specific calendar dates</p>
+            <h3 style="color: var(--text-main); font-weight: 800; font-size: 1.25rem; margin: 0;">Summary of Achievement</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Review logged focus times by specific calendar dates</p>
         </div>
         <div style="position: relative; width: 180px;">
-            <input type="date" id="summaryFilterDate" style="cursor: pointer; padding: 8px 12px; font-weight: 600; font-size: 0.9rem;" onclick="try { this.showPicker(); } catch(e) {}">
+            <input type="date" id="summaryFilterDate" style="cursor: pointer; padding: 8px 12px; font-weight: 600; font-size: 0.9rem; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; width: 100%;" onclick="try { this.showPicker(); } catch(e) {}">
         </div>
     </div>
 
     <div class="stats-grid" id="summaryAchievementOutputGrid">
-        </div>
+    </div>
 </div>
 
 <%- include('partials/footer') %>

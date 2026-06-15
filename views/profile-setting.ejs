@@ -2,7 +2,7 @@
 
 <div style="margin-bottom: 2rem; text-align: center;">
     <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);">Account Profile Settings</h1>
-    <p style="color: var(--text-muted);">Personalize your dashboard presence profile metrics</p>
+    <p style="color: var(--text-muted); margin-top: 4px;">Personalize your dashboard presence profile metrics</p>
 </div>
 
 <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2.5rem; max-width: 650px; margin: 0 auto; box-shadow: var(--shadow);">
@@ -10,7 +10,7 @@
         
         <div style="margin-bottom: 1.5rem;">
             <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem; color: var(--text-main);">Display Profile Name</label>
-            <input type="text" name="displayName" value="<%= user.displayName || '' %>" style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main); font-size: 1rem;" placeholder="Enter custom profile display identity name">
+            <input type="text" name="displayName" value="<%= user.displayName || '' %>" style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main); font-size: 1rem; font-family: inherit;" placeholder="Enter custom profile display identity name">
         </div>
 
         <div style="margin-bottom: 1.5rem;">
@@ -20,10 +20,10 @@
 
         <div style="margin-bottom: 2rem;">
             <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem; color: var(--text-main);">Profile Picture Avatar Link</label>
-            <input type="text" name="avatarUrl" value="<%= user.avatarUrl || '' %>" style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main); font-size: 1rem;" placeholder="Paste a public web reference image URL address path">
+            <input type="text" name="avatarUrl" value="<%= user.avatarUrl || '' %>" style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main); font-size: 1rem; font-family: inherit;" placeholder="Paste a public web reference image URL address path">
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: 600; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; letter-spacing: 0.5px;">
             Save Changes
         </button>
     </form>

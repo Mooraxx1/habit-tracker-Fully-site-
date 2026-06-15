@@ -13,6 +13,7 @@
     --border: #e2e8f0;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --invert-value: invert(0); /* Dynamic calendar fix hook */
 }
 
 [data-theme="dark"] {
@@ -25,6 +26,7 @@
     --primary-hover: #a5b4fc;
     --border: #334155;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --invert-value: invert(1); /* Forces dark icons on light fields and vice-versa */
 }
 
 /* ==========================================================================
@@ -37,7 +39,6 @@
 }
 
 html {
-    /* Allows natural overflow expansion based on content height */
     height: auto;
     min-height: 100%;
 }
@@ -50,7 +51,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    /* Enforces layout height to stretch flexibly instead of clamping down */
     height: auto; 
     padding-bottom: 140px !important; 
     width: 100%;
@@ -216,17 +216,17 @@ input, select, textarea {
    ========================================================================== */
 .activity-grid-wrapper {
     width: 100%;
-    overflow-x: hidden;                  /* Suppresses horizontal layout overflow leaks completely */
+    overflow-x: hidden;
     padding: 0.5rem 0;
 }
 
 .activity-grid {
     display: grid;
-    grid-template-columns: repeat(53, 10px); /* FIXED: Guarantees exactly 53 chronological columns across */
-    grid-template-rows: repeat(7, 10px);    /* Enforces exactly 7 rows for days of the week */
+    grid-template-columns: repeat(53, 10px);
+    grid-template-rows: repeat(7, 10px);
     gap: 3px;
     margin: 1rem auto 0.5rem;
-    width: fit-content;                      /* Automatically centers structural geometry width balances */
+    width: fit-content;
     overflow: hidden !important;
 }
 
@@ -238,14 +238,12 @@ input, select, textarea {
     transition: background-color 0.5s ease, transform 0.3s ease;
 }
 
-/* Color levels matching active calendar day contribution tallies */
 .activity-block[data-level="0"] { background-color: var(--border); }
 .activity-block[data-level="1"] { background-color: #0e4429; } 
 .activity-block[data-level="2"] { background-color: #006d32; } 
 .activity-block[data-level="3"] { background-color: #26a641; } 
 .activity-block[data-level="4"] { background-color: #39d353; }
 
-/* Re-optimized ambient flash animation layout rules */
 .activity-block.pulse-glow {
     transform: scale(1.15);
     box-shadow: 0 0 6px rgba(57, 211, 83, 0.8);
@@ -327,7 +325,7 @@ input, select, textarea {
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 2rem;
-    align-items: stretch; /* FIXED: Enforces symmetric height matching across grid tracks */
+    align-items: stretch;
 }
 
 @media (max-width: 768px) {
@@ -444,7 +442,7 @@ input, select, textarea {
     background-color: var(--border);
     border-radius: 6px;
     display: flex;
-    overflow: visible; /* Essential for floating overlays to display */
+    overflow: visible;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
@@ -470,7 +468,6 @@ input, select, textarea {
     background: linear-gradient(90deg, #3b82f6, #1d4ed8);
 }
 
-/* Fixes alignment by shifting the entire line structure to its perfect true center */
 .timeline-indicator-arrow {
     position: absolute;
     top: 0;
@@ -481,20 +478,20 @@ input, select, textarea {
     z-index: 10;
     transition: left 0.5s ease;
     box-shadow: 0 0 4px #f59e0b;
-    transform: translateX(-50%); /* Crucial: Locks the center point directly over the layout percentage line */
+    transform: translateX(-50%);
 }
 
-/* Hanging triangle attached securely above the indicator line container */
 .timeline-indicator-arrow::before {
     content: '▼';
     position: absolute;
     top: -13px;
     left: 50%;
-    transform: translateX(-50%); /* Crucial: Centers the triangle over the 2px vertical line perfectly */
+    transform: translateX(-50%);
     color: #f59e0b;
     font-size: 11px;
     line-height: 1;
 }
+
 /* ==========================================================================
    9. DIARY FEED
    ========================================================================== */
@@ -663,18 +660,16 @@ input, select, textarea {
 }
 .btn-inline-edit:hover { background-color: var(--primary-hover); }
 
+/* FIXED: Re-engineered dynamic visibility token filtering mapping framework profiles */
 input[type="datetime-local"]::-webkit-calendar-picker-indicator,
 input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+    filter: var(--invert-value) !important;
     cursor: pointer;
 }
 
-
 /* ==========================================================================
-   13. CROSS-PLATFORM LAYOUT RESPONSIVE GRID ENGINE (APPENDED ADDITION)
+   13. CROSS-PLATFORM LAYOUT RESPONSIVE GRID ENGINE
    ========================================================================== */
-
-/* --- TIER 1: SMARTPHONES (360px, 390px, 412px, 430px Display viewports) --- */
 @media (max-width: 599px) {
     .container {
         padding: 1rem;
@@ -719,7 +714,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
 }
 
-/* --- TIER 2: TABLETS (768px iPad, 820px Surface Pro, 1024px Screen Sizes) --- */
 @media (min-width: 600px) and (max-width: 1024px) {
     .container {
         max-width: 100%;
@@ -730,7 +724,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
 }
 
-/* --- TIER 3 & 4: ADVANCED MONITOR BASES (1440px / 1920x1080 Screens) --- */
 @media (min-width: 1440px) {
     .container {
         max-width: 1320px;
@@ -740,7 +733,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
 }
 
-/* --- TIER 5: TV PANELS (3840x2160 4K UHD, Cinema & Large Format Displays) --- */
 @media (min-width: 2400px) {
     .container {
         max-width: 2100px;

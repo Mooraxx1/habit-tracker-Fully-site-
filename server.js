@@ -226,7 +226,12 @@ app.get("/diary", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
     if (!user) return res.redirect("/auth/logout");
-    res.render("diary", { title: "My Diary Wall", posts: user.posts });
+    // FIXED: Passed user habits array down to prevent EJS loop compilation errors
+    res.render("diary", {
+      title: "My Diary Wall",
+      posts: user.posts,
+      habits: user.habits,
+    });
   } catch (err) {
     res.redirect("/");
   }
@@ -292,7 +297,29 @@ app.post("/api/habits", isAuthenticated, async (req, res) => {
   }
 });
 
-// FIXED: Added seamless dynamic deletion endpoint handler matching frontend request mapping
+// FIXED: Added inline modification update route used by manage.ejs dialogs
+app.post("/api/habits/update", isAuthenticated, async (req, res) => {
+  try {
+    const { id, name, requiredTime } = req.body;
+    const user = await User.findById(req.session.userId);
+    if (!user)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    const habit = user.habits.find((h) => h.id === id);
+    if (habit) {
+      habit.name = name;
+      habit.requiredTime = parseFloat(requiredTime);
+      await user.save();
+      return res.json({ success: true });
+    }
+    res
+      .status(404)
+      .json({ success: false, message: "Habit routine not found" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 app.delete("/api/habits/:id", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
@@ -307,12 +334,54 @@ app.delete("/api/habits/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+// FIXED: Appended missing diary wall submission logging handler
+app.post("/api/diary", isAuthenticated, async (req, res) => {
+  try {
+    const { content, habitTagged } = req.body;
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.redirect("/auth/logout");
+
+    let matchedHabitName = null;
+    if (habitTagged && habitTagged.trim() !== "") {
+      const targetHabit = user.habits.find((h) => h.id === habitTagged);
+      if (targetHabit) matchedHabitName = targetHabit.name;
+    }
+
+    const currentDateObj = new Date();
+    const formattedDate = currentDateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const formattedTime = currentDateObj.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    user.posts.unshift({
+      id: Date.now().toString(),
+      date: formattedDate,
+      time: formattedTime,
+      content: content.trim(),
+      habitName: matchedHabitName,
+      imageUrl: null, // Defaults cleanly without multipart complexity configuration crash points
+    });
+
+    await user.save();
+    res.redirect("/diary");
+  } catch (err) {
+    console.error("[Diary Post Engine]: Error saving update:", err.message);
+    res.status(500).send("Error compiling diary post logs.");
+  }
+});
+
 app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
   try {
     const { habitId, minutesWorked } = req.body;
     const user = await User.findById(req.session.userId);
     if (!user)
       return res.status(401).json({ success: false, message: "Unauthorized" });
+
     const habit = user.habits.find((h) => h.id === habitId);
     if (habit) {
       habit.completedTime = Math.min(

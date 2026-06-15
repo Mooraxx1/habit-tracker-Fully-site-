@@ -1,10 +1,24 @@
 <%- include('partials/header') %>
 
+<style>
+    /* Responsive adjustment for the profile layout container grid */
+    .profile-details-grid {
+        display: grid; 
+        grid-template-columns: 1fr 2fr; 
+        gap: 2rem;
+    }
+    @media (max-width: 768px) {
+        .profile-details-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
 <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700;">Profile Details</h1>
+    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);">Profile Details</h1>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+<div class="profile-details-grid">
     <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center; box-shadow: var(--shadow); height: fit-content;">
         
         <% if (user.avatarUrl && user.avatarUrl.trim() !== "") { %>
@@ -12,16 +26,16 @@
                 <img src="<%= user.avatarUrl %>" alt="Profile Avatar" style="width: 100%; height: 100%; object-fit: cover; display: block;">
             </div>
         <% } else { %>
-            <div style="width: 100px; height: 100px; background: var(--primary); color: #fff; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold;">
+            <div style="width: 100px; height: 100px; background: var(--primary); color: #ffffff; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; box-shadow: var(--shadow);">
                 <%= user.username.charAt(0).toUpperCase() %>
             </div>
         <% } %>
 
-        <a href="/profile/settings" style="display: inline-block; font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600; margin-bottom: 1.5rem;">
+        <a href="/profile/settings" style="display: inline-block; font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px dashed var(--primary);">
             📸 Change Picture
         </a>
 
-        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main);">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 700;">
             <%= user.displayName && user.displayName.trim() !== "" ? user.displayName : user.username %>
         </h2>
         
@@ -31,36 +45,36 @@
 
         <hr style="border: 0; border-top: 1px solid var(--border); margin: 1rem 0;">
 
-        <p style="color: var(--text-muted); font-size: 0.95rem; font-style: italic; line-height: 1.4; word-break: break-word;">
+        <p style="color: var(--text-muted); font-size: 0.95rem; font-style: italic; line-height: 1.4; word-break: break-word; padding: 0 10px;">
             <%= user.bio && user.bio.trim() !== "" ? user.bio : "No personalization biography written yet." %>
         </p>
     </div>
 
     <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow);">
-        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--text-main);">Habit Completion Statistics</h3>
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--text-main); font-weight: 700;">Habit Completion Statistics</h3>
         
         <% if (user.habits && user.habits.length > 0) { %>
             <% user.habits.forEach(habit => { %>
                 <% 
-                   let safeRequiredTime = habit.requiredTime || 1;
-                   let percentage = Math.min(Math.round((habit.completedTime / safeRequiredTime) * 100), 100); 
+                    let safeRequiredTime = habit.requiredTime || 1;
+                    let percentage = Math.min(Math.round((habit.completedTime / safeRequiredTime) * 100), 100); 
                 %>
-                <div style="margin-bottom: 1.5rem; background: var(--bg-color); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
+                <div style="margin-bottom: 1.5rem; background: var(--bg-color); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border); transition: background-color 0.3s ease;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-weight: 600;">
                         <span style="color: var(--text-main);"><%= habit.name %></span>
                         <span style="color: var(--primary);"><%= percentage %>%</span>
                     </div>
-                    <div style="background: var(--border); height: 10px; border-radius: 5px; overflow: hidden;">
-                        <div style="background: var(--primary); height: 100%; width: <%= percentage %>%; transition: width 0.4s ease;"></div>
+                    <div style="background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);">
+                        <div style="background: var(--primary); height: 100%; width: <%= percentage %>%; transition: width 0.4s ease; border-radius: 5px;"></div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
-                        <span>Logged: <%= habit.completedTime.toFixed(1) %> hrs</span>
-                        <span>Target: <%= safeRequiredTime %> hrs</span>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+                        <span>Logged: <strong style="color: var(--text-main);"><%= habit.completedTime.toFixed(1) %></strong> hrs</span>
+                        <span>Target: <strong><%= safeRequiredTime %></strong> hrs</span>
                     </div>
                 </div>
             <% }) %>
         <% } else { %>
-            <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">No tracking routines initialized yet. Go to your management tab to get started!</p>
+            <p style="color: var(--text-muted); text-align: center; padding: 4rem 0; font-style: italic;">No tracking routines initialized yet. Go to your management tab to get started!</p>
         <% } %>
     </div>
 </div>

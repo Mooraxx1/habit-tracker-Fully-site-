@@ -1,5 +1,7 @@
 </main>
-</div> <div id="miniTimerOverlay" class="mini-timer-bar hidden-overlay">
+</div> 
+
+    <div id="miniTimerOverlay" class="mini-timer-bar hidden-overlay">
         <div class="mini-timer-content">
             <div class="mini-status-block">
                 <span id="miniSessionStatus">Focus Time!</span>
@@ -16,6 +18,13 @@
     <footer class="main-footer">
         <p>&copy; <%= new Date().getFullYear() %> <strong>DevMoor</strong>. All rights reserved.</p>
     </footer>
+
+    <script>
+        (function() {
+            const savedThemeMapping = localStorage.getItem("theme") || "dark";
+            document.documentElement.setAttribute("data-theme", savedThemeMapping);
+        })();
+    </script>
 
     <script src="/js/script.js"></script>
 </body>

@@ -1,63 +1,63 @@
 <%- include('partials/header') %>
 
-<div class="page-header">
-    <h1 data-i18n="diary_title">My Diary Wall</h1>
+<div class="page-header" style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);" data-i18n="diary_title">My Diary Wall</h1>
 </div>
 
-<div class="card create-post">
+<div class="card create-post" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 2rem;">
     <form action="/api/diary" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="diaryHabitSelect" style="display:block; font-weight:600; margin-bottom:5px;">Link to Habit (Optional)</label>
-            <select name="habitTagged" id="diaryHabitSelect">
-                <option value="" selected>General Achievement / Un-tagged</option>
-                <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
+        <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="diaryHabitSelect" style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; color: var(--text-main);">Link to Habit (Optional)</label>
+            <select name="habitTagged" id="diaryHabitSelect" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit;">
+                <option value="" style="background-color: var(--card-bg); color: var(--text-main);" selected>General Achievement / Un-tagged</option>
+                <% if (typeof habits !== 'undefined' && habits && habits.length > 0) { %>
                     <% habits.forEach(habit => { %>
-                        <option value="<%= habit.id %>"><%= habit.name %></option>
+                        <option value="<%= habit.id %>" style="background-color: var(--card-bg); color: var(--text-main);"><%= habit.name %></option>
                     <% }) %>
                 <% } %>
             </select>
         </div>
 
-        <div class="form-group">
-            <textarea name="content" placeholder="What did you achieve today?" rows="3" required></textarea>
+        <div class="form-group" style="margin-bottom: 1rem;">
+            <textarea name="content" placeholder="What did you achieve today?" rows="3" required style="width: 100%; padding: 12px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
         </div>
 
-        <div class="post-actions">
-            <input type="file" name="postImage" accept="image/*" id="fileUpload">
-            <button type="submit" class="btn btn-primary" data-i18n="btn_post">Post</button>
+        <div class="post-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+            <input type="file" name="postImage" accept="image/*" id="fileUpload" style="width: auto; border: none; padding: 0; background: transparent; margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer;" data-i18n="btn_post">Post</button>
         </div>
     </form>
 </div>
 
-<div class="feed">
-    <% if (typeof posts !== 'undefined' && posts.length > 0) { %>
+<div class="feed" style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <% if (typeof posts !== 'undefined' && posts && posts.length > 0) { %>
         <% posts.forEach(post => { %>
-            <div class="card post">
-                <div class="post-header">
-                    <strong><%= post.date %></strong>
+            <div class="card post" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow);">
+                <div class="post-header" style="display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+                    <strong style="color: var(--text-main); font-weight: 700;"><%= post.date %></strong>
                     <span><%= post.time %></span>
                 </div>
                 
                 <% if (post.habitName) { %>
-                    <span class="badge-tag" style="background-color: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-bottom: 10px;">
+                    <span class="badge-tag" style="background-color: var(--primary); color: #ffffff; padding: 3px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                         🎯 <%= post.habitName %>
                     </span>
                 <% } %>
 
-                <p><%= post.content %></p>
+                <p style="color: var(--text-main); font-size: 1rem; line-height: 1.5; word-break: break-word;"><%= post.content %></p>
                 
                 <% if (post.imageUrl) { %>
-                    <div class="post-image-container" style="margin-top:15px; border-radius:6px; overflow:hidden;">
-                        <img src="<%= post.imageUrl %>" alt="Post Achievement Image" style="width:100%; height:auto; display:block;">
+                    <div class="post-image-container" style="margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow);">
+                        <img src="<%= post.imageUrl %>" alt="Post Achievement Image" style="width: 100%; height: auto; display: block; object-fit: cover;">
                     </div>
                 <% } %>
             </div>
         <% }) %>
     <% } else { %>
-        <div class="card empty-state-card" style="text-align: center; border: 2px dashed var(--border); background: transparent; box-shadow: none;">
-            <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">✍️</div>
-            <h3>Your memory wall is empty</h3>
-            <p style="color: var(--text-muted);">Document your daily progression steps. Log updates above to populate your profile feed history.</p>
+        <div class="card empty-state-card" style="text-align: center; border: 2px dashed var(--border); background: transparent; box-shadow: none; padding: 4rem 2rem; border-radius: 12px;">
+            <div class="empty-icon" style="font-size: 3.5rem; margin-bottom: 1rem;">✍️</div>
+            <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">Your memory wall is empty</h3>
+            <p style="color: var(--text-muted); max-width: 440px; margin: 0 auto; font-size: 0.95rem; line-height: 1.4;">Document your daily progression steps. Log updates above to populate your profile feed history.</p>
         </div>
     <% } %>
 </div>

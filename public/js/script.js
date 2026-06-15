@@ -1,20 +1,35 @@
 // ==========================================================================
-// ALL FRONTIER EVENT IMPLEMENTATIONS & CONFIGURATIONS ENGINE
+// HABIT TRACKER GENERAL CONTROL & ENGINE CONFIGURATIONS
 // ==========================================================================
 console.log("[UI Script]: Initializing core workspace engine modules...");
 
+// Global reference pointer mapping targeted habit items across structural DOM cards
 let currentDeleteTargetId = null;
 
-// Clean, global visibility configurations for deletion card execution handling
+/**
+ * Universally visible hook used by individual habit components to trigger custom removal prompts
+ */
 function triggerDeleteConfirmation(habitId, habitName) {
   currentDeleteTargetId = habitId;
-  document.getElementById("deleteTargetHabitName").innerText = habitName;
-  document.getElementById("deleteConfirmationModal").style.display = "flex";
+  const targetedTextNode = document.getElementById("deleteTargetHabitName");
+  if (targetedTextNode) {
+    targetedTextNode.innerText = habitName;
+  }
+  const modalOverlay = document.getElementById("deleteConfirmationModal");
+  if (modalOverlay) {
+    modalOverlay.style.display = "flex";
+  }
 }
 
+/**
+ * Safe utility to drop the visibility matrix of the confirmation popups
+ */
 function closeDeleteModal() {
   currentDeleteTargetId = null;
-  document.getElementById("deleteConfirmationModal").style.display = "none";
+  const modalOverlay = document.getElementById("deleteConfirmationModal");
+  if (modalOverlay) {
+    modalOverlay.style.display = "none";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -22,33 +37,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const isManagePage = window.location.pathname === "/manage";
 
   // ==========================================================================
-  // 1. THEME MANAGEMENT ENGINE CONTROLLER (LIGHT/DARK ROUTINES)
+  // 1. PERSISTENT THEME CONTROLLER MODULE (LIGHT / DARK RE-ENGINEERING)
   // ==========================================================================
   const themeToggleBtn = document.getElementById("themeToggle");
 
-  // Set default storage configurations tracking fallback checks
+  // Ensure fallbacks are firmly recorded inside the client's memory storage
   if (!localStorage.getItem("theme")) {
     localStorage.setItem("theme", "dark");
   }
 
-  const currentTheme = localStorage.getItem("theme");
-  document.documentElement.setAttribute("data-theme", currentTheme);
+  const initialStoredTheme = localStorage.getItem("theme");
+  document.documentElement.setAttribute("data-theme", initialStoredTheme);
 
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener("click", () => {
-      const activeTheme = document.documentElement.getAttribute("data-theme");
-      const targetTheme = activeTheme === "dark" ? "light" : "dark";
+      const activeDOMTheme =
+        document.documentElement.getAttribute("data-theme");
+      const structuralTargetTheme =
+        activeDOMTheme === "dark" ? "light" : "dark";
 
-      document.documentElement.setAttribute("data-theme", targetTheme);
-      localStorage.setItem("theme", targetTheme);
+      document.documentElement.setAttribute(
+        "data-theme",
+        structuralTargetTheme,
+      );
+      localStorage.setItem("theme", structuralTargetTheme);
       console.log(
-        `[UI Engine]: System root theme mapping shifted to -> ${targetTheme}`,
+        `[UI Engine]: System root theme mapping shifted to -> ${structuralTargetTheme}`,
       );
     });
   }
 
   // ==========================================================================
-  // 2. DYNAMIC CONFIRMATION DELETE EXECUTION BINDINGS
+  // 2. HABIT DELETION ASYNCHRONOUS TRANSACTION FLOWS (MODAL BACKEND MATRIX)
   // ==========================================================================
   const confirmDeleteBtn = document.getElementById("confirmDeleteButton");
   if (isManagePage && confirmDeleteBtn) {
@@ -56,22 +76,25 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!currentDeleteTargetId) return;
 
       try {
-        const response = await fetch(`/api/habits/${currentDeleteTargetId}`, {
-          method: "DELETE",
-        });
-        const result = await response.json();
+        const networkSyncResponse = await fetch(
+          `/api/habits/${currentDeleteTargetId}`,
+          {
+            method: "DELETE",
+          },
+        );
+        const responseDataParsed = await networkSyncResponse.json();
 
-        if (result.success) {
+        if (responseDataParsed.success) {
           window.location.reload();
         } else {
           console.error(
-            "Critical failure during routine data synchronization removal operations.",
+            "[Data Sync]: Error response received from removal endpoints.",
           );
         }
-      } catch (err) {
+      } catch (networkTransportErr) {
         console.error(
-          "Networking transport vector error connecting to endpoints ->",
-          err,
+          "[Transport Error]: Failed connecting to delete vector ->",
+          networkTransportErr,
         );
       } finally {
         closeDeleteModal();
@@ -80,65 +103,97 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================================================
-  // 3. PROFESSIONAL 10-SECOND OSCILLATOR AUDIO SYNTHESIS HUB
+  // 3. NATIVE PROFESSIONAL 10-SECOND OSCILLATOR AUDIO SYNTHESIS HUB
   // ==========================================================================
   function triggerProfessionalAlarmSequence() {
     console.log(
       "[Audio Engine]: Initiating dual-tone 10s professional Pomodoro alarm sequence.",
     );
 
-    // Check framework support parameters mapping execution structures
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
+    const WebAudioContextConstructor =
+      window.AudioContext || window.webkitAudioContext;
+    if (!WebAudioContextConstructor) return;
 
-    const ctx = new AudioContextClass();
-    const duration = 10; // Enforce exact 10 second run runtime restriction
-    const startTime = ctx.currentTime;
+    const audioCtx = new WebAudioContextConstructor();
+    const absoluteSessionStartTime = audioCtx.currentTime;
+    const targetAlertDurationSeconds = 10; // Forced lock tracking parameter constraint
 
-    // Emits neat rhythmic dual pulses every second block tracking intervals loops
-    for (let i = 0; i < duration; i++) {
-      const pulseStart = startTime + i;
+    // Synthesize rhythmic sound pulses repeating across exact 1-second chunks
+    for (
+      let secondBlockIdx = 0;
+      secondBlockIdx < targetAlertDurationSeconds;
+      secondBlockIdx++
+    ) {
+      const rhythmicPulseTriggerOffset =
+        absoluteSessionStartTime + secondBlockIdx;
 
-      // Primary tone oscillator sequence configuration blocks
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.type = "sine";
-      osc1.frequency.setValueAtTime(880, pulseStart); // High professional A5 note pitch register
+      // Frequency Pitch Oscillator node 1 (High crisp clear indicator tone)
+      const structuralOscillatorNode1 = audioCtx.createOscillator();
+      const gainNodeEnvelope1 = audioCtx.createGain();
+      structuralOscillatorNode1.type = "sine";
+      structuralOscillatorNode1.frequency.setValueAtTime(
+        880,
+        rhythmicPulseTriggerOffset,
+      ); // Pitch standard A5
 
-      // Secondary supporting harmonizing frequency array matching node maps
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.type = "triangle";
-      osc2.frequency.setValueAtTime(440, pulseStart); // Foundation pitch structure tone
+      // Frequency Pitch Oscillator node 2 (Deep warm underlying supporting harmonic anchor)
+      const structuralOscillatorNode2 = audioCtx.createOscillator();
+      const gainNodeEnvelope2 = audioCtx.createGain();
+      structuralOscillatorNode2.type = "triangle";
+      structuralOscillatorNode2.frequency.setValueAtTime(
+        440,
+        rhythmicPulseTriggerOffset,
+      ); // Pitch standard A4
 
-      // Rhythmic envelope decay compression structure execution algorithms
-      gain1.gain.setValueAtTime(0.15, pulseStart);
-      gain1.gain.exponentialRampToValueAtTime(0.001, pulseStart + 0.15);
+      // Map standard volume step curves to manage professional decay envelopes
+      gainNodeEnvelope1.gain.setValueAtTime(0.2, rhythmicPulseTriggerOffset);
+      gainNodeEnvelope1.gain.exponentialRampToValueAtTime(
+        0.001,
+        rhythmicPulseTriggerOffset + 0.15,
+      );
 
-      gain2.gain.setValueAtTime(0.08, pulseStart);
-      gain2.gain.exponentialRampToValueAtTime(0.001, pulseStart + 0.15);
+      gainNodeEnvelope2.gain.setValueAtTime(0.1, rhythmicPulseTriggerOffset);
+      gainNodeEnvelope2.gain.exponentialRampToValueAtTime(
+        0.001,
+        rhythmicPulseTriggerOffset + 0.15,
+      );
 
-      // Repeat a rapid secondary echo double beat step structure
-      gain1.gain.setValueAtTime(0.15, pulseStart + 0.25);
-      gain1.gain.exponentialRampToValueAtTime(0.001, pulseStart + 0.4);
-      gain2.gain.setValueAtTime(0.08, pulseStart + 0.25);
-      gain2.gain.exponentialRampToValueAtTime(0.001, pulseStart + 0.4);
+      // Double beat bounce delay segment mapping calculations
+      gainNodeEnvelope1.gain.setValueAtTime(
+        0.2,
+        rhythmicPulseTriggerOffset + 0.25,
+      );
+      gainNodeEnvelope1.gain.exponentialRampToValueAtTime(
+        0.001,
+        rhythmicPulseTriggerOffset + 0.4,
+      );
+      gainNodeEnvelope2.gain.setValueAtTime(
+        0.1,
+        rhythmicPulseTriggerOffset + 0.25,
+      );
+      gainNodeEnvelope2.gain.exponentialRampToValueAtTime(
+        0.001,
+        rhythmicPulseTriggerOffset + 0.4,
+      );
 
-      // Wire nodes to hardware transport channels audio pipelines
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
+      // Bind operational system hardware connection pipelines
+      structuralOscillatorNode1.connect(gainNodeEnvelope1);
+      gainNodeEnvelope1.connect(audioCtx.destination);
 
-      osc1.start(pulseStart);
-      osc1.stop(pulseStart + 0.5);
-      osc2.start(pulseStart);
-      osc2.stop(pulseStart + 0.5);
+      structuralOscillatorNode2.connect(gainNodeEnvelope2);
+      gainNodeEnvelope2.connect(audioCtx.destination);
+
+      // Execute execution ranges cleanly across individual pulse spaces
+      structuralOscillatorNode1.start(rhythmicPulseTriggerOffset);
+      structuralOscillatorNode1.stop(rhythmicPulseTriggerOffset + 0.5);
+
+      structuralOscillatorNode2.start(rhythmicPulseTriggerOffset);
+      structuralOscillatorNode2.stop(rhythmicPulseTriggerOffset + 0.5);
     }
   }
 
   // ==========================================================================
-  // 4. TIMELINE INDICATOR INTERFACE MOUNT ENGINE
+  // 4. TIMELINE INDICATOR INTERFACE TRACK RENDER ENGINE
   // ==========================================================================
   const timelineIndicator = document.getElementById("timelineIndicator");
   const timelineCompletionPercent = document.getElementById(
@@ -147,13 +202,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const timelineTrack = document.getElementById("timelineTrack");
 
   function updateGlobalUIs() {
+    // Halt entirely if target rendering controls don't explicitly load on layout models
     if (
       !isTimerPage ||
       !timelineIndicator ||
       !timelineCompletionPercent ||
       !timelineTrack
-    )
+    ) {
       return;
+    }
 
     const currentRoundIdx =
       parseInt(localStorage.getItem("tm_currentRoundIdx")) || 0;
@@ -179,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
       accumulatedSeconds += wMins * 60 - timeLeft;
     }
 
-    // Capture state rollover triggers directly at edge completion vectors boundaries
+    // Trigger the professional synthesizer alarm array when the ticking values shift exactly to zero
     if (
       timeLeft === 0 &&
       parseInt(localStorage.getItem("tm_runningStateActive")) === 1
@@ -199,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateGlobalUIs();
 
   // ==========================================================================
-  // 5. SECURE AUTHENTICATION PASSWORD VISIBILITY TOGGLE HIERARCHY
+  // 5. SECURITY VIEW PASSWORD FORMS DISPLAY TOGGLE ROUTINES
   // ==========================================================================
   const passwordToggleMappings = [
     { triggerId: "togglePassword", inputId: "loginPassword" },

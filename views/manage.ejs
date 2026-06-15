@@ -1,68 +1,82 @@
 <%- include('partials/header') %>
 
-<div class="page-header">
-    <h1 data-i18n="manage_title">Manage Habits</h1>
+<div class="page-header" style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);" data-i18n="manage_title">Manage Habits</h1>
 </div>
 
-<div class="card">
+<div class="card" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow);">
     <form class="habit-form" action="/api/habits" method="POST">
         
         <div class="form-group">
             <label for="habitNameField" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">Habit Name</label>
-            <input type="text" id="habitNameField" name="name" placeholder="e.g. Fullstack Bootcamp Dr Angela Yu" required>
+            <input type="text" id="habitNameField" name="name" placeholder="e.g. Fullstack Bootcamp Dr Angela Yu" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px;" required>
         </div>
         
         <div class="form-group" style="margin-top: 1.25rem;">
             <label for="habitTimeField" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">Required Time daily (HH:MM)</label>
-            <input type="text" id="habitTimeField" name="requiredTimeFormat" placeholder="03:30" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" title="Format must match HH:MM structure specifications" style="font-family: monospace;" required>
+            <input type="text" id="habitTimeField" name="requiredTimeFormat" placeholder="03:30" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" title="Format must match HH:MM structure specifications" style="font-family: monospace; width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px;" required>
         </div>
         
         <div class="form-group" style="margin-top: 1.25rem;">
             <label for="habitScheduleField" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">Starting Date (Optional)</label>
-            <input type="datetime-local" id="habitScheduleField" name="schedule" style="cursor: pointer;" onclick="try { this.showPicker(); } catch(e) {}">
+            <input type="datetime-local" id="habitScheduleField" name="schedule" style="cursor: pointer; width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px;" onclick="try { this.showPicker(); } catch(e) {}">
         </div>
 
         <div class="form-group" style="margin-top: 1.25rem;">
             <label style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">Reference Source URLs (Optional)</label>
             <div id="urlFieldsContainerWrapper">
                 <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <input type="url" name="urls" placeholder="e.g. https://www.udemy.com/course/the-complete-web-development-bootcamp/">
-                    <button type="button" class="btn btn-primary" onclick="appendNewUrlFieldRow()" style="padding: 0 16px; font-size: 1.25rem; border-radius: 6px;">+</button>
+                    <input type="url" name="urls" placeholder="e.g. https://www.udemy.com/course/the-complete-web-development-bootcamp/" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px;">
+                    <button type="button" class="btn btn-primary" onclick="appendNewUrlFieldRow()" style="padding: 0 16px; font-size: 1.25rem; border-radius: 6px; cursor: pointer;">+</button>
                 </div>
             </div>
         </div>
         
-        <button type="submit" class="btn btn-primary" data-i18n="add_habit" style="width: 100%; margin-top: 1.5rem; padding: 12px; font-size: 1rem;">Add Habit</button>
+        <button type="submit" class="btn btn-primary" data-i18n="add_habit" style="width: 100%; margin-top: 1.5rem; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 6px; cursor: pointer;">Add Habit</button>
     </form>
 </div>
 
-<div class="manage-habits-list" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>'>
-    <h3 style="margin-bottom: 1.5rem; color: var(--text-main);">Existing Habits Registry</h3>
+<div class="manage-habits-list" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>' style="margin-top: 3rem;">
+    <h3 style="margin-bottom: 1.5rem; color: var(--text-main); font-weight: 700;">Existing Habits Registry</h3>
     
-    <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
+    <% if (typeof habits !== 'undefined' && habits && habits.length > 0) { %>
         <% habits.forEach(habit => { %>
-            <div class="habit-management-card" id="card-<%= habit.id %>">
+            <div class="habit-management-card" id="card-<%= habit.id %>" style="display: flex; justify-content: space-between; align-items: center; background-color: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 1rem; box-shadow: var(--shadow);">
                 <div class="habit-info-block">
-                    <h4 id="name-display-<%= habit.id %>"><%= habit.name %></h4>
-                    <p>Daily Requirement Target: <strong style="color: var(--primary);"><%= habit.requiredTime %> hrs</strong></p>
+                    <h4 id="name-display-<%= habit.id %>" style="font-size: 1.2rem; color: var(--text-main); font-weight: 700; margin: 0 0 0.5rem 0;"><%= habit.name %></h4>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">Daily Requirement Target: <strong style="color: var(--primary); font-weight: 700;"><%= habit.requiredTime %> hrs</strong></p>
                     <% if (habit.urls && habit.urls.length > 0) { %>
-                        <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px;">
+                        <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px;">
                             <% habit.urls.forEach((url, index) => { %>
-                                <a href="<%= url %>" target="_blank" style="font-size: 0.8rem; color: var(--primary); text-decoration: underline;">URL Link #<%= index + 1 %></a>
+                                <a href="<%= url %>" target="_blank" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600; border-bottom: 1px dashed var(--primary);">Link #<%= index + 1 %></a>
                             <% }) %>
                         </div>
                     <% } %>
                 </div>
                 
-                <div class="habit-controls-block">
-                    <button class="btn btn-inline-edit" onclick="triggerInlineEdit('<%= habit.id %>', '<%= habit.name %>', '<%= habit.requiredTime %>')">Edit</button>
-                    <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;" onclick="triggerInlineDelete('<%= habit.id %>')">Remove</button>
+                <div class="habit-controls-block" style="display: flex; gap: 0.75rem;">
+                    <button class="btn btn-inline-edit" style="padding: 8px 16px; font-size: 0.85rem; font-weight: 600; border-radius: 6px; cursor: pointer;" onclick="triggerInlineEdit('<%= habit.id %>', '<%= habit.name %>', '<%= habit.requiredTime %>')">Edit</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 0.85rem; font-weight: 600; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; cursor: pointer;" onclick="triggerDeleteConfirmation('<%= habit.id %>', '<%= habit.name %>')">Remove</button>
                 </div>
             </div>
         <% }) %>
     <% } else { %>
-        <p style="color: var(--text-muted); font-style: italic;">No routines initialized yet. Register one above to manage tracking operations.</p>
+        <p style="color: var(--text-muted); font-style: italic; text-align: center; padding: 2rem 0;">No routines initialized yet. Register one above to manage tracking operations.</p>
     <% } %>
+</div>
+
+<div id="deleteConfirmationModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 2000;">
+    <div class="card" style="max-width: 420px; width: 90%; text-align: center; padding: 2rem; border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 12px; background-color: var(--card-bg);">
+        <div style="width: 56px; height: 56px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">!</div>
+        <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 700;">Remove Routine?</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 2rem;">
+            Are you sure you want to delete <span id="deleteTargetHabitName" style="color: var(--primary); font-weight: 700;"></span>? This historical analytics logging tracking cannot be undone.
+        </p>
+        <div style="display: flex; gap: 1rem;">
+            <button type="button" class="btn" style="background: var(--border); color: var(--text-main); width: 100%; padding: 12px; font-weight: 600; border-radius: 6px; cursor: pointer;" onclick="closeDeleteModal()">Cancel</button>
+            <button id="confirmDeleteButton" type="button" class="btn" style="background: #ef4444; color: #ffffff; width: 100%; padding: 12px; font-weight: 600; border-radius: 6px; cursor: pointer;">Confirm Delete</button>
+        </div>
+    </div>
 </div>
 
 <div id="successHabitModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center;">
@@ -70,7 +84,7 @@
         <div style="font-size: 3rem; margin-bottom: 1rem; color: #10b981;">✨</div>
         <h3 style="margin-bottom: 0.75rem; color: var(--text-main); font-weight: 800; font-size: 1.4rem;">Habit Created!</h3>
         <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;">Your new routine has been securely saved and initialized inside your dashboard ledger maps.</p>
-        <button onclick="cleanModalURLRedirect()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; font-size: 1rem; border-radius: 6px;">Close</button>
+        <button onclick="cleanModalURLRedirect()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; font-size: 1rem; border-radius: 6px; cursor: pointer;">Close</button>
     </div>
 </div>
 
@@ -82,7 +96,8 @@ if (urlParams.get('created') === 'success') {
 }
 
 function cleanModalURLRedirect() {
-    document.getElementById('successHabitModal').remove();
+    const modal = document.getElementById('successHabitModal');
+    if (modal) modal.remove();
     window.location.href = "/manage"; 
 }
 
@@ -99,14 +114,13 @@ if (durationInputField) {
     });
 }
 
-// NEW ENGINE: Spawns incremental URL parameters slots natively with removal triggers
 function appendNewUrlFieldRow() {
     const wrapper = document.getElementById("urlFieldsContainerWrapper");
     const dynamicRow = document.createElement("div");
     dynamicRow.style = "display: flex; gap: 10px; margin-bottom: 8px;";
     dynamicRow.innerHTML = `
-        <input type="url" name="urls" placeholder="Additional source reference anchor URL link">
-        <button type="button" class="btn" onclick="this.parentElement.remove()" style="padding: 0 16px; background-color: var(--danger); color: white; border-radius: 6px;">✕</button>
+        <input type="url" name="urls" placeholder="Additional source reference anchor URL link" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px;">
+        <button type="button" class="btn" onclick="this.parentElement.remove()" style="padding: 0 16px; background-color: var(--danger); color: white; border-radius: 6px; cursor: pointer;">✕</button>
     `;
     wrapper.appendChild(dynamicRow);
 }
@@ -122,18 +136,6 @@ function triggerInlineEdit(id, currentName, currentTime) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: id, name: newName.trim(), requiredTime: parseFloat(newTime) })
-    })
-    .then(res => res.json())
-    .then(data => { if (data.success) window.location.reload(); })
-    .catch(err => console.error(err));
-}
-
-function triggerInlineDelete(id) {
-    if (!confirm("Are you sure you want to completely remove this habit?")) return;
-    fetch("/api/habits/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id })
     })
     .then(res => res.json())
     .then(data => { if (data.success) window.location.reload(); })
