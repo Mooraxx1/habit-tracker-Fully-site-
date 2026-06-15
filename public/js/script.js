@@ -705,7 +705,6 @@ function closeResetModal() {
   if (customResetModal) customResetModal.style.display = "none";
 }
 
-// Fixed declaration reference syntax issue
 function resetTimerTrigger(bypassConfirm = false) {
   if (bypassConfirm !== true) {
     openResetModal();
@@ -787,7 +786,7 @@ if (isTimerPage && workInput && breakInput) {
 initGlobalTimerState();
 
 // ==========================================================================
-// 4B. APPENDED TAIL END: REACTIVE GOAL VERIFICATION PLAN CALCULATOR
+// 4B. APPENDED TAIL END: REACTIVE GOAL COMPLETENESS CHECKER
 // ==========================================================================
 const calcSelectElement = document.getElementById("habitSelect");
 const calcWorkTimeElement = document.getElementById("workTime");
@@ -809,7 +808,7 @@ if (
   function recomputeInteractiveGoalPlan() {
     const structuralHabitId = calcSelectElement.value;
     if (!structuralHabitId) {
-      calcOutputPanelWrapper.innerHTML = `<p style="color: var(--text-muted); font-style: italic; font-size: 0.9rem; text-align: center; padding: 1rem 0;">Select an initialized habit above to activate live goal calculation maps.</p>`;
+      calcOutputPanelWrapper.innerHTML = `<p style="color: var(--text-muted); font-style: italic; font-size: 0.9rem; text-align: center; padding: 1rem 0;">Select an initialized habit above to activate live goal completeness checker.</p>`;
       return;
     }
 
@@ -839,17 +838,30 @@ if (
     const reqM = Math.round(totalTargetMinutesRequired % 60);
     const reqDisplayStr = `${reqH}H : ${reqM.toString().padStart(2, "0")}M`;
 
-    if (plannedProductionMinutes >= totalTargetMinutesRequired) {
+    if (plannedProductionMinutes === totalTargetMinutesRequired) {
+      // GREEN CARD: Perfect Balance
       calcOutputPanelWrapper.innerHTML = `
                 <div style="text-align: center; padding: 0.5rem 0;">
                     <p style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main);">Target Habit: <span style="color: var(--primary);">${chosenHabitObject.name}</span></p>
                     <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Total Requirement: <strong>${reqDisplayStr}</strong></p>
                     <div style="background-color: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 0.95rem;">
-                        🎉 That's exact what you need, good to go!
+                        🎉 That's exactly what you need, good to go!
+                    </div>
+                </div>
+            `;
+    } else if (plannedProductionMinutes > totalTargetMinutesRequired) {
+      // BLUE/ANY OTHER COLOR CARD: Over Target Plan Allocation
+      calcOutputPanelWrapper.innerHTML = `
+                <div style="text-align: center; padding: 0.5rem 0;">
+                    <p style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main);">Target Habit: <span style="color: var(--primary);">${chosenHabitObject.name}</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Total Requirement: <strong>${reqDisplayStr}</strong></p>
+                    <div style="background-color: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; color: #3b82f6; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 0.95rem;">
+                        🚀 That's more than your plan!
                     </div>
                 </div>
             `;
     } else {
+      // RED CARD: Under Budget Plan Limits
       const missingMinutesDelta =
         totalTargetMinutesRequired - plannedProductionMinutes;
       const deltaH = Math.floor(missingMinutesDelta / 60);
@@ -860,7 +872,9 @@ if (
                 <div style="text-align: left; padding: 0.25rem 0;">
                     <p style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main);">Routine: <span style="color: var(--primary);">${chosenHabitObject.name}</span></p>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Daily Goal: <strong>${reqDisplayStr}</strong></p>
-                    <p style="font-size: 0.9rem; line-height: 1.4; color: var(--text-main);">To achieve your target layout thresholds, you still need to add more <strong style="color: var(--danger); font-family: monospace; font-size: 1rem;">${deltaDisplayStr}</strong> into your planned focus rounds configuration block.</p>
+                    <div style="background-color: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; padding: 12px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; line-height: 1.4;">
+                        To achieve your target layout thresholds, you still need to add more <strong style="font-family: monospace; font-size: 1rem;">${deltaDisplayStr}</strong> into your planned focus rounds configuration block.
+                    </div>
                 </div>
             `;
     }
