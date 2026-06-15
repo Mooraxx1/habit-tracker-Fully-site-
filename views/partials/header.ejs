@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= typeof title !== 'undefined' ? title : 'DevMoor Habit Tracker' %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Restores Dropdown Hover Functionality */
+        .profile-dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content {
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .dropdown-content a {
+            border-bottom: 1px solid var(--bg-color);
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
     <div class="site-wrapper">
@@ -17,8 +33,17 @@
                 <a href="/manage">Manage</a>
                 <a href="/timer">Timer</a>
                 <a href="/diary">Diary</a>
-                <a href="/profile/details">Profile</a>
-                <button id="themeToggle" class="btn" style="background: var(--border); color: var(--text-main); padding: 6px 12px; margin-left: 10px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; border: none;">🌓 Theme</button>
+                
+                <div class="profile-dropdown" style="margin-left: 1rem;">
+                    <button class="btn-profile">Profile ▼</button>
+                    <div class="dropdown-content">
+                        <a href="/profile/details">My Profile</a>
+                        <a href="/profile/settings">Account Settings</a>
+                    </div>
+                </div>
+
+                <button id="themeToggle" class="btn" style="background: var(--border); color: var(--text-main); padding: 6px 12px; margin-left: 15px; font-size: 0.9rem; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; display: flex; align-items: center; gap: 6px;"></button>
+                
                 <a href="/auth/logout" style="margin-left: 15px; color: var(--danger); font-weight: 700;">Logout</a>
             </div>
         </nav>
