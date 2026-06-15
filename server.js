@@ -6,7 +6,7 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const MongoStore = require("connect-mongo"); // Modern v5+ syntax
+const MongoStore = require("connect-mongo");
 const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 
@@ -30,17 +30,17 @@ mongoose
   .catch((err) => console.error("Database connection error:", err));
 
 // ==========================================================================
-// 3. PERSISTENT SESSION MIDDLEWARE (MODERN CONNECT-MONGO SYNTAX)
+// 3. PERSISTENT SESSION MIDDLEWARE (UNIVERSAL VERSION FALLBACK WORKING)
 // ==========================================================================
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "devmoor_secret_key",
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: MONGO_URI, // Correct property for connect-mongo v5+
-      collectionName: "sessions",
-    }),
+    store:
+      typeof MongoStore.create === "function"
+        ? MongoStore.create({ mongoUrl: MONGO_URI, collectionName: "sessions" })
+        : new MongoStore({ url: MONGO_URI, collectionName: "sessions" }),
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // Keep users logged in for 7 days
     },
@@ -76,7 +76,6 @@ app.post("/auth/register", async (req, res) => {
     });
     await newUser.save();
 
-    // Pass a success flag to the login page if you want, or just redirect
     res.redirect("/login");
   } catch (err) {
     res.render("register", {
