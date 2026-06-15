@@ -943,18 +943,20 @@ window.addEventListener("click", function (event) {
 // 7. SECURE AUTHENTICATION PASSWORD VISIBILITY TOGGLE HIERARCHY
 // ==========================================================================
 const passwordToggleMappings = [
-  { triggerId: "togglePassword", inputId: "loginPassword" },
-  { triggerId: "toggleRegPassword", inputId: "regPassword" },
+  { triggerId: 'togglePassword', inputId: 'loginPassword' },
+  { triggerId: 'toggleRegPassword', inputId: 'regPassword' }
 ];
 
 passwordToggleMappings.forEach(({ triggerId, inputId }) => {
   const triggerElement = document.getElementById(triggerId);
   const inputElement = document.getElementById(inputId);
-
+  
+  // Guard clause to prevent errors when elements aren't rendered on the DOM
   if (triggerElement && inputElement) {
-    triggerElement.addEventListener("click", () => {
-      const isPasswordType = inputElement.getAttribute("type") === "password";
-      inputElement.setAttribute("type", isPasswordType ? "text" : "password");
+    triggerElement.addEventListener('click', () => {
+      const isPasswordType = inputElement.getAttribute('type') === 'password';
+      inputElement.setAttribute('type', isPasswordType ? 'text' : 'password');
+      console.log(`[UI Engine]: Toggled ${inputId} visibility to: ${isPasswordType ? 'text' : 'password'}`);
     });
   }
 });

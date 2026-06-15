@@ -1,7 +1,8 @@
 <%- include('partials/header') %>
 
 <div class="card" style="max-width: 500px; margin: 4rem auto 2rem; box-shadow: var(--shadow); border: 1px solid var(--border);">
-    <h1 style="text-align: center; margin-bottom: 2.5rem; color: var(--text-main); font-weight: 800;">Create an Account</h1>
+    
+    <h1 style="text-align: center; margin-bottom: 2.5rem; color: var(--text-main); font-weight: 800; letter-spacing: -0.5px;" data-i18n="register_title">Create an Account</h1>
     
     <% if (typeof error !== 'undefined' && error) { %>
         <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 12px; border-radius: 6px; margin-bottom: 1.5rem; text-align: center; font-weight: 600;">
@@ -11,28 +12,27 @@
 
     <form action="/auth/register" method="POST">
         <div class="form-group">
-            <label for="regUsername">Username</label>
-            <input type="text" name="username" placeholder="Choose a unique username" required>
+            <label for="regUsername" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">Username</label>
+            <input type="text" id="regUsername" name="username" placeholder="Choose a unique username" style="margin-top: 8px;" required>
         </div>
         
         <div class="form-group" style="margin-top: 1.5rem; position: relative;">
-            <label for="regPassword">Password</label>
-            <input type="password" id="regPassword" name="password" placeholder="Create a secure password" style="padding-right: 40px;" required>
-            <span id="toggleRegPassword" style="position: absolute; right: 12px; top: 42px; cursor: pointer;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <label for="regPassword" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">Password</label>
+            <input type="password" id="regPassword" name="password" placeholder="Create a secure password" style="margin-top: 8px; padding-right: 40px;" required>
+            <span id="toggleRegPassword" style="position: absolute; right: 12px; top: 42px; cursor: pointer; display: flex; align-items: center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
             </span>
         </div>
         
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 14px;">Sign Up</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 14px; font-size: 1rem; font-weight: 700; letter-spacing: 0.5px; border-radius: 6px;">Sign Up</button>
     </form>
+    
+    <p style="text-align: center; margin-top: 2rem; font-size: 0.95rem; color: var(--text-muted);">
+        Already have an account? <a href="/login" style="color: var(--primary); text-decoration: none; font-weight: 800; border-bottom: 2px solid var(--primary); padding-bottom: 2px; margin-left: 4px;">Login here</a>
+    </p>
 </div>
-
-<script>
-    const toggleReg = document.querySelector('#toggleRegPassword');
-    const passReg = document.querySelector('#regPassword');
-    toggleReg.addEventListener('click', () => {
-        passReg.setAttribute('type', passReg.getAttribute('type') === 'password' ? 'text' : 'password');
-    });
-</script>
 
 <%- include('partials/footer') %>
