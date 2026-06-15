@@ -4,52 +4,82 @@
     <h1 data-i18n="timer_title">Focus Timer</h1>
 </div>
 
-<div class="timer-layout">
+<div class="timer-layout" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>' style="align-items: stretch;">
     
-    <div class="card settings-sidebar">
+    <div class="settings-sidebar" style="display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
         
-        <div class="form-group">
-            <label for="habitSelect" data-i18n="select_habit_label">Target Habit</label>
-            <select class="habit-select" id="habitSelect" required>
-                <option value="" disabled selected data-i18n="select_habit">Select a habit...</option>
-                <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
-                    <% habits.forEach(habit => { %>
-                        <option value="<%= habit.id %>"><%= habit.name %></option>
-                    <% }) %>
-                <% } %>
-            </select>
+        <div class="card" style="margin-bottom: 0; flex: 1;">
+            <div class="form-group">
+                <label for="habitSelect" data-i18n="select_habit_label">Target Habit</label>
+                <select id="habitSelect">
+                    <option value="" data-i18n="select_habit">Select a habit...</option>
+                    <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
+                        <% habits.forEach(habit => { %>
+                            <option value="<%= habit.id %>"><%= habit.name %></option>
+                        <% }) %>
+                    <% } %>
+                </select>
+            </div>
+            
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="workTime" data-i18n="work_label">Focus Session (Minutes)</label>
+                <input type="number" id="workTime" min="1" value="25">
+            </div>
+            
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="breakTime" data-i18n="break_label">Break Session (Minutes)</label>
+                <input type="number" id="breakTime" min="1" value="5">
+            </div>
+            
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="sessions" data-i18n="sessions_label">Total Target Rounds</label>
+                <input type="number" id="sessions" min="1" value="4">
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="workTime" data-i18n="work_label">Focus Session (Minutes)</label>
-            <input type="number" id="workTime" value="25" min="1" max="60" placeholder="e.g. 25">
-        </div>
-        
-        <div class="form-group">
-            <label for="breakTime" data-i18n="break_label">Break Session (Minutes)</label>
-            <input type="number" id="breakTime" value="5" min="1" max="60" placeholder="e.g. 5">
-        </div>
-        
-        <div class="form-group">
-            <label for="sessions" data-i18n="sessions_label">Total Target Rounds</label>
-            <input type="number" id="sessions" value="4" min="1" max="10" placeholder="e.g. 4">
+        <div class="card" id="habitGoalCalculatorPanelCard" style="border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; margin-bottom: 0; flex: 1; background: linear-gradient(145deg, var(--card-bg), var(--bg-color));">
+            <h4 style="color: var(--text-main); font-weight: 800; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">Goal Verification Plan</h4>
+            <div id="goalCalcTextOutputWrapper">
+                <p style="color: var(--text-muted); font-style: italic; font-size: 0.9rem; text-align: center; padding: 1rem 0;">Select an initialized habit above to activate live goal calculation maps.</p>
+            </div>
         </div>
     </div>
 
-    <div class="card timer-display-pane">
-        <h3 id="sessionStatus" data-i18n="status_ready">Ready to Focus</h3>
+    <div class="card timer-display-pane" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
+        <h2 id="sessionStatus" data-i18n="status_ready" style="margin-top: 0;">Ready to Focus</h2>
         
-        <div class="circle-container">
-            <svg class="timer-svg" viewBox="0 0 200 200">
-                <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
-                <circle class="ring-progress stage-green" id="progressRing" cx="100" cy="100" r="90"></circle>
+        <div class="circle-container" style="margin-top: 1rem;">
+            <svg class="timer-svg">
+                <circle class="ring-bg" cx="140" cy="140" r="90"></circle>
+                <circle id="progressRing" class="ring-progress" cx="140" cy="140" r="90"></circle>
             </svg>
             <div class="clock-display" id="timeDisplay">25:00</div>
         </div>
+        
+        <div class="timer-controls" style="margin-top: 1rem;">
+            <button class="btn btn-primary" id="startBtn" data-i18n="btn_start" style="padding: 12px 30px; font-size: 1.1rem;">Start</button>
+            <button class="btn" id="resetBtn" data-i18n="btn_reset" style="background-color: var(--border); color: var(--text-main); padding: 12px 30px; font-size: 1.1rem;">Reset</button>
+        </div>
 
-        <div class="timer-controls">
-            <button class="btn btn-primary" id="startBtn" data-i18n="btn_start">Start</button>
-            <button class="btn btn-danger" id="resetBtn" data-i18n="btn_reset">Reset</button>
+        <div class="timeline-container" style="margin-top: 1.5rem; width: 100%;">
+            <div class="timeline-meta">
+                <span id="timelineCompletionPercent">Completion: 0%</span>
+                <span>Session Matrix Map</span>
+            </div>
+            <div class="timeline-tracker-track" id="timelineTrack">
+                <div class="timeline-indicator-arrow" id="timelineIndicator"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="customResetModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center;">
+    <div class="card" style="max-width: 400px; width: 90%; text-align: center; padding: 2rem; border-radius: 12px;">
+        <h3 style="margin-bottom: 1rem; color: var(--text-main);">Reset Focus Session?</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.75rem;">Are you sure you want to stop this timer sequence loop? This will clear current session block logs.</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="confirmResetBtn" class="btn btn-danger" style="flex: 1;">Yes, Reset</button>
+            <button id="cancelResetBtn" class="btn" style="flex: 1; background-color: var(--border); color: var(--text-main);">Cancel</button>
         </div>
     </div>
 </div>

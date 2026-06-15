@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. COLOR PALETTE & THEMES
+   1. DESIGN TOKENS, CORE COLORS & THEMES
    ========================================================================== */
 :root {
     --bg-color: #f4f7f6;
@@ -12,26 +12,32 @@
     --danger: #e53e3e;
     --border: #e2e8f0;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 [data-theme="dark"] {
-    --bg-color: #1a202c;
-    --nav-bg: #2d3748;
-    --card-bg: #2d3748;
-    --text-main: #f7fafc;
-    --text-muted: #a0aec0;
-    --border: #4a5568;
+    --bg-color: #0f172a;
+    --nav-bg: #1e293b;
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #818cf8; 
+    --primary-hover: #a5b4fc;
+    --border: #334155;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
 /* ==========================================================================
-   2. CORE LAYOUT STRUCTURE & STICKY FOOTER
+   2. CORE LAYOUT STRUCTURE & STICKY CONFIGURATIONS
    ========================================================================== */
-html, body {
-    height: 100%;
+*, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+html, body {
+    height: 100%;
 }
 
 body {
@@ -42,10 +48,11 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    padding-bottom: 140px !important; 
 }
 
 .site-wrapper {
-    flex: 1 0 auto; /* Expands content to push footer down */
+    flex: 1 0 auto;
 }
 
 .container {
@@ -60,7 +67,7 @@ body {
 }
 
 /* ==========================================================================
-   3. NAVBAR
+   3. NAVIGATION HEADER & CUSTOM PROFILE DROPDOWN
    ========================================================================== */
 .navbar {
     display: flex;
@@ -69,6 +76,26 @@ body {
     background-color: var(--nav-bg);
     padding: 1rem 2rem;
     box-shadow: var(--shadow);
+    border-bottom: 1px solid var(--border);
+}
+
+.logo a {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+    font-family: var(--font-family);
+    transition: color 0.3s ease;
+}
+
+.logo a:hover {
+    color: var(--primary-hover);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
 }
 
 .nav-links a {
@@ -82,6 +109,51 @@ body {
     color: var(--primary);
 }
 
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-profile {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: var(--card-bg);
+    min-width: 180px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    z-index: 99999;
+    border: 1px solid var(--border);
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    margin: 0;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: var(--bg-color);
+}
+
 /* ==========================================================================
    4. UI CARDS, FORMS & BUTTONS
    ========================================================================== */
@@ -91,6 +163,7 @@ body {
     border-radius: 12px;
     box-shadow: var(--shadow);
     margin-bottom: 2rem;
+    border: 1px solid var(--border);
 }
 
 input, select, textarea {
@@ -101,6 +174,7 @@ input, select, textarea {
     color: var(--text-main);
     border: 1px solid var(--border);
     border-radius: 6px;
+    font-family: inherit;
 }
 
 .form-group {
@@ -114,11 +188,13 @@ input, select, textarea {
     cursor: pointer;
     font-weight: bold;
     color: white;
+    font-family: inherit;
 }
 
 .btn-primary { background-color: var(--primary); }
 .btn-primary:hover { background-color: var(--primary-hover); }
 .btn-danger { background-color: var(--danger); }
+
 .btn-icon {
     background: none;
     border: none;
@@ -131,31 +207,42 @@ input, select, textarea {
 /* ==========================================================================
    5. 365 ACTIVITY GRAPH (GITHUB TRACKER)
    ========================================================================== */
+.activity-grid-wrapper {
+    width: 100%;
+    overflow-x: hidden;                  /* Suppresses horizontal layout overflow leaks completely */
+    padding: 0.5rem 0;
+}
+
 .activity-grid {
     display: grid;
-    grid-template-columns: repeat(52, 1fr);
+    grid-template-columns: repeat(53, 10px); /* FIXED: Guarantees exactly 53 chronological columns across */
+    grid-template-rows: repeat(7, 10px);    /* Enforces exactly 7 rows for days of the week */
     gap: 3px;
-    margin-top: 1rem;
-    overflow-x: auto;
+    margin: 1rem auto 0.5rem;
+    width: fit-content;                      /* Automatically centers structural geometry width balances */
+    overflow: hidden !important;
 }
 
 .activity-block {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     background-color: var(--border);
     border-radius: 2px;
-    transition: background-color 0.8s ease, transform 0.3s ease;
+    transition: background-color 0.5s ease, transform 0.3s ease;
 }
 
+/* Color levels matching active calendar day contribution tallies */
+.activity-block[data-level="0"] { background-color: var(--border); }
+.activity-block[data-level="1"] { background-color: #0e4429; } 
+.activity-block[data-level="2"] { background-color: #006d32; } 
+.activity-block[data-level="3"] { background-color: #26a641; } 
+.activity-block[data-level="4"] { background-color: #39d353; }
+
+/* Re-optimized ambient flash animation layout rules */
 .activity-block.pulse-glow {
     transform: scale(1.15);
+    box-shadow: 0 0 6px rgba(57, 211, 83, 0.8);
 }
-
-/* Intensity Colors */
-.activity-block[data-level="1"] { background-color: #9be9a8; }
-.activity-block[data-level="2"] { background-color: #40c463; }
-.activity-block[data-level="3"] { background-color: #30a14e; }
-.activity-block[data-level="4"] { background-color: #216e39; }
 
 /* ==========================================================================
    6. PROGRESS PERCENTAGE CIRCLES & DASHBOARD
@@ -172,6 +259,7 @@ input, select, textarea {
     border-radius: 12px;
     text-align: center;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border);
 }
 
 .circle {
@@ -197,7 +285,6 @@ input, select, textarea {
     justify-content: center;
 }
 
-/* Empty Dashboard State Card */
 .empty-state-card {
     text-align: center;
     padding: 3rem 1.5rem;
@@ -233,12 +320,13 @@ input, select, textarea {
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 2rem;
-    align-items: start;
+    align-items: stretch; /* FIXED: Enforces symmetric height matching across grid tracks */
 }
 
 @media (max-width: 768px) {
     .timer-layout {
         grid-template-columns: 1fr;
+        align-items: start;
     }
 }
 
@@ -255,7 +343,7 @@ input, select, textarea {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem 1.5rem;
+    padding: 2.5rem 1.5rem;
 }
 
 #sessionStatus {
@@ -271,7 +359,6 @@ input, select, textarea {
     margin: 1.5rem 0;
 }
 
-/* SVG Countdown Perimeter */
 .circle-container {
     position: relative;
     width: 280px;
@@ -301,7 +388,6 @@ input, select, textarea {
     transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
 }
 
-/* Timer Countdown States */
 .stage-green  { stroke: #10b981; }
 .stage-orange { stroke: #f59e0b; }
 .stage-red    { stroke: #ef4444; }
@@ -323,10 +409,87 @@ input, select, textarea {
     display: flex;
     justify-content: center;
     gap: 1rem;
+    margin-bottom: 2.5rem;
 }
 
 /* ==========================================================================
-   8. DIARY FEED
+   8. DYNAMIC INTERACTIVE TIMELINE STYLES
+   ========================================================================== */
+.timeline-container {
+    width: 100%;
+    max-width: 550px;
+    margin: 1rem auto 0;
+    padding: 0 10px;
+}
+
+.timeline-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.timeline-tracker-track {
+    position: relative;
+    height: 24px;
+    background-color: var(--border);
+    border-radius: 6px;
+    display: flex;
+    overflow: visible; /* Essential for floating overlays to display */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timeline-segment {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    border-right: 1px solid rgba(254, 254, 254, 0.15);
+    position: relative;
+    white-space: nowrap;
+}
+
+.segment-focus {
+    background: linear-gradient(90deg, #6366f1, #4f46e5);
+}
+
+.segment-break {
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+/* Fixes alignment by shifting the entire line structure to its perfect true center */
+.timeline-indicator-arrow {
+    position: absolute;
+    top: 0;
+    left: 0%;
+    width: 2px;
+    height: 24px;
+    background-color: #f59e0b;
+    z-index: 10;
+    transition: left 0.5s ease;
+    box-shadow: 0 0 4px #f59e0b;
+    transform: translateX(-50%); /* Crucial: Locks the center point directly over the layout percentage line */
+}
+
+/* Hanging triangle attached securely above the indicator line container */
+.timeline-indicator-arrow::before {
+    content: '▼';
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    transform: translateX(-50%); /* Crucial: Centers the triangle over the 2px vertical line perfectly */
+    color: #f59e0b;
+    font-size: 11px;
+    line-height: 1;
+}
+/* ==========================================================================
+   9. DIARY FEED
    ========================================================================== */
 .post-actions {
     display: flex;
@@ -355,50 +518,21 @@ input, select, textarea {
 }
 
 /* ==========================================================================
-   9. MAIN SITE FOOTER
-   ========================================================================== */
-.main-footer {
-    flex-shrink: 0;
-    width: 100%;
-    text-align: center;
-    padding: 1.5rem 0;
-    border-top: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    background-color: var(--nav-bg);
-    box-shadow: var(--shadow);
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.main-footer p {
-    margin: 0;
-    padding: 0;
-}
-
-.main-footer strong {
-    color: var(--primary);
-}
-
-/* ==========================================================================
-   10. PERSISTENT MINI OVERLAY TIMER STYLES
+   10. PERSISTENT MINI OVERLAY TIMER BAR
    ========================================================================== */
 .mini-timer-bar {
-    position: fixed;
-    bottom: 50px; /* Sits perfectly right above your main site footer */
-    left: 0;
-    width: 100%;
+    position: fixed !important;
+    bottom: 50px !important; 
+    left: 0 !important;
+    width: 100% !important;
     background-color: var(--nav-bg);
     border-top: 2px solid var(--primary);
     box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
     padding: 0.75rem 2rem;
-    z-index: 9999;
+    z-index: 9998 !important;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
 
-/* Slide animation states toggled via script classes */
 .hidden-overlay {
     transform: translateY(120%);
     opacity: 0;
@@ -446,7 +580,210 @@ input, select, textarea {
     border-radius: 4px;
 }
 
-/* Padding fix to prevent page elements from getting trapped under the floating bar when scrolling */
-body {
-    padding-bottom: 60px; 
+/* ==========================================================================
+   11. MAIN SITE FOOTER
+   ========================================================================== */
+.main-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 50px !important;
+    z-index: 9999 !important;
+    background-color: var(--nav-bg);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.main-footer p {
+    margin: 0;
+    padding: 0;
+}
+
+.main-footer strong {
+    color: var(--primary);
+}
+
+/* ==========================================================================
+   12. HABIT MANAGEMENT UTILITY MODULE
+   ========================================================================== */
+.manage-habits-list {
+    margin-top: 3rem;
+}
+
+.habit-management-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-bg);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.habit-management-card:hover {
+    transform: translateY(-2px);
+}
+
+.habit-info-block h4 {
+    font-size: 1.1rem;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+}
+
+.habit-info-block p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.habit-controls-block {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-inline-edit {
+    background-color: var(--primary);
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+.btn-inline-edit:hover { background-color: var(--primary-hover); }
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+
+/* ==========================================================================
+   13. CROSS-PLATFORM LAYOUT RESPONSIVE GRID ENGINE (APPENDED ADDITION)
+   ========================================================================== */
+
+/* --- TIER 1: SMARTPHONES (360px, 390px, 412px, 430px Display viewports) --- */
+@media (max-width: 599px) {
+    .container {
+        padding: 1rem;
+    }
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        text-align: center;
+    }
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+    .nav-links a {
+        margin: 0 0.5rem;
+        font-size: 0.9rem;
+    }
+    .activity-grid-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .habit-management-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .habit-controls-block {
+        width: 100%;
+    }
+    .habit-controls-block .btn {
+        flex: 1;
+        text-align: center;
+    }
+    .mini-timer-content {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* --- TIER 2: TABLETS (768px iPad, 820px Surface Pro, 1024px Screen Sizes) --- */
+@media (min-width: 600px) and (max-width: 1024px) {
+    .container {
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- TIER 3 & 4: ADVANCED MONITOR BASES (1440px / 1920x1080 Screens) --- */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1320px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* --- TIER 5: TV PANELS (3840x2160 4K UHD, Cinema & Large Format Displays) --- */
+@media (min-width: 2400px) {
+    .container {
+        max-width: 2100px;
+        padding: 4rem;
+    }
+    body {
+        font-size: 1.25rem;
+    }
+    .logo a {
+        font-size: 2.25rem;
+    }
+    .nav-links a {
+        font-size: 1.3rem;
+        margin: 0 1.5rem;
+    }
+    .btn-profile {
+        font-size: 1.3rem;
+    }
+    .card {
+        padding: 2.5rem;
+        border-radius: 20px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 2rem;
+    }
+    .circle {
+        width: 140px;
+        height: 140px;
+        font-size: 2rem;
+    }
+    .circle span {
+        width: 114px;
+        height: 114px;
+    }
+    .activity-grid {
+        grid-template-columns: repeat(53, 16px);
+        grid-template-rows: repeat(7, 16px);
+        gap: 4px;
+    }
+    .activity-block {
+        width: 16px;
+        height: 16px;
+    }
+    input, select, textarea {
+        padding: 14px;
+        font-size: 1.15rem;
+    }
+    .btn {
+        padding: 14px 28px;
+        font-size: 1.15rem;
+    }
 }

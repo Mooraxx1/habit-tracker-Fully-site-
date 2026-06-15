@@ -4,34 +4,51 @@
     <h1 data-i18n="dashboard_title">Activity Overview</h1>
 </div>
 
-<div class="card graph-card">
-    <h3 data-i18n="activity_graph">365-Day Activity</h3>
-    <div id="activityGraph" class="activity-grid"></div>
+<div class="card" id="activityTrackerCard">
+    <h3 style="margin-bottom: 1rem; color: var(--text-main);" data-i18n="activity_graph">365-Day Activity</h3>
+    <div class="activity-grid-wrapper">
+        <div class="activity-grid" id="activityGraph" data-posts='<%= JSON.stringify(posts || []) %>'>
+            </div>
+    </div>
 </div>
 
-<div id="habitsContainer" class="stats-grid">
+<div class="stats-grid" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>'>
     <% if (typeof habits !== 'undefined' && habits.length > 0) { %>
         <% habits.forEach(habit => { %>
             <% 
-               // Protection barrier against dividing by zero if requiredTime is missing
-               let safeRequiredTime = habit.requiredTime || 1;
-               let percentage = Math.min(Math.round((habit.completedTime / safeRequiredTime) * 100), 100); 
+               let safeRequired = habit.requiredTime || 1;
+               let percentage = Math.min(Math.round((habit.completedTime / safeRequired) * 100), 100); 
             %>
-            <div class="stat-card habit-item">
+            <div class="stat-card">
                 <div class="circle" style="--percentage: <%= percentage %>%;">
                     <span><%= percentage %>%</span>
                 </div>
-                <h3><%= habit.name %></h3>
-                <p><%= habit.completedTime.toFixed(1) %> hrs / <%= safeRequiredTime %> hrs total</p>
+                <h4 style="color: var(--text-main); margin-bottom: 0.25rem;"><%= habit.name %></h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Daily Progress Map</p>
             </div>
         <% }) %>
     <% } else { %>
-        <div id="noHabitsMessage" class="card empty-state-card">
-            <div class="empty-icon">📊</div>
+        <div class="card empty-state-card" style="grid-column: 1 / -1; width: 100%;">
+            <div class="empty-icon">🌱</div>
             <h3 data-i18n="empty_habits_title">Here you will see and track your habits</h3>
             <p data-i18n="empty_habits_desc">Go to the "Manage" tab to add your first habit and start tracking your progress!</p>
         </div>
     <% } %>
+</div>
+
+<div class="card" style="margin-top: 2rem; border: 1px solid var(--border); background-color: var(--card-bg); box-shadow: var(--shadow);">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h3 style="color: var(--text-main); font-weight: 800;">Summary of Achievement</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Review logged focus times by specific calendar dates</p>
+        </div>
+        <div style="position: relative; width: 180px;">
+            <input type="date" id="summaryFilterDate" style="cursor: pointer; padding: 8px 12px; font-weight: 600; font-size: 0.9rem;" onclick="try { this.showPicker(); } catch(e) {}">
+        </div>
+    </div>
+
+    <div class="stats-grid" id="summaryAchievementOutputGrid">
+        </div>
 </div>
 
 <%- include('partials/footer') %>

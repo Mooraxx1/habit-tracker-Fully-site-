@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const ObjectId = require("mongo-objectid");
-const User = require("./models/User"); // We are bringing our Mongoose model back for the cloud!
+const User = require("./models/User");
 
 const app = express();
 
@@ -21,8 +21,6 @@ app.use(express.static(path.join(__dirname, "public")));
 // ==========================================================================
 // 2. HYBRID DATABASE CONFIGURATION (LOCAL MEMORY OR LIVE CLOUD)
 // ==========================================================================
-// Render will automatically look for a secure environment variable called MONGODB_URI.
-// If it doesn't find it (like on your local machine), it safely runs the Simulation Engine.
 const CLOUD_URI = process.env.MONGODB_URI;
 let UserDatabaseSim = [];
 let isCloud = false;
@@ -69,7 +67,13 @@ function isAuthenticated(req, res, next) {
 // ==========================================================================
 
 app.get("/register", (req, res) => {
-  res.render("register", { title: "Register" });
+  const errorMsg = req.session.registerError || null;
+  const successUser = req.session.registeredUser || null;
+
+  req.session.registerError = null;
+  req.session.registeredUser = null;
+
+  res.render("register", { title: "Register", errorMsg, successUser });
 });
 
 app.post("/auth/register", async (req, res) => {
@@ -79,12 +83,19 @@ app.post("/auth/register", async (req, res) => {
 
     if (isCloud) {
       const existingUser = await User.findOne({ username: cleanUsername });
-      if (existingUser) return res.send("Username already taken.");
+      if (existingUser) {
+        req.session.registerError =
+          "This username is already taken. Try another identifier.";
+        return res.redirect("/register");
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({
         username: cleanUsername,
         password: hashedPassword,
+        displayName: "",
+        bio: "",
+        avatarUrl: "",
         habits: [],
         posts: [],
       });
@@ -93,26 +104,39 @@ app.post("/auth/register", async (req, res) => {
       const existingUser = UserDatabaseSim.find(
         (u) => u.username === cleanUsername,
       );
-      if (existingUser) return res.send("Username already taken.");
+      if (existingUser) {
+        req.session.registerError =
+          "This username is already taken. Try another identifier.";
+        return res.redirect("/register");
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = {
         _id: new ObjectId().toString(),
         username: cleanUsername,
         password: hashedPassword,
+        displayName: "",
+        bio: "",
+        avatarUrl: "",
         habits: [],
         posts: [],
       };
       UserDatabaseSim.push(newUser);
     }
-    res.redirect("/login");
+
+    req.session.registeredUser = cleanUsername;
+    res.redirect("/register");
   } catch (err) {
-    res.status(500).send("Registration error: " + err);
+    req.session.registerError = "Registration engine failure: " + err.message;
+    res.redirect("/register");
   }
 });
 
 app.get("/login", (req, res) => {
-  res.render("login", { title: "Login" });
+  const errorMsg = req.session.loginError || null;
+  req.session.loginError = null;
+
+  res.render("login", { title: "Login", errorMsg });
 });
 
 app.post("/auth/login", async (req, res) => {
@@ -127,15 +151,25 @@ app.post("/auth/login", async (req, res) => {
       user = UserDatabaseSim.find((u) => u.username === cleanUsername);
     }
 
-    if (!user) return res.send("Invalid username or password.");
+    if (!user) {
+      req.session.loginError =
+        "Invalid profile credentials check tracker maps. Identity matches unindexed.";
+      return res.redirect("/login");
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.send("Invalid username or password.");
+    if (!isMatch) {
+      req.session.loginError =
+        "Invalid password data matrix entries. Access verification handshake failed.";
+      return res.redirect("/login");
+    }
 
     req.session.userId = user._id.toString();
     res.redirect("/");
   } catch (err) {
-    res.status(500).send("Login error: " + err);
+    req.session.loginError =
+      "Security verification exception error mapping routine arrays.";
+    res.redirect("/login");
   }
 });
 
@@ -147,31 +181,54 @@ app.get("/", isAuthenticated, async (req, res) => {
   const user = isCloud
     ? await User.findById(req.session.userId)
     : UserDatabaseSim.find((u) => u._id === req.session.userId);
-  res.render("index", { title: "Dashboard", habits: user.habits });
+  res.render("index", {
+    title: "Dashboard",
+    habits: user.habits,
+    posts: user.posts,
+  });
 });
 
-app.get("/manage", isAuthenticated, (req, res) => {
-  res.render("manage", { title: "Manage Habits" });
+app.get("/manage", isAuthenticated, async (req, res) => {
+  const user = isCloud
+    ? await User.findById(req.session.userId)
+    : UserDatabaseSim.find((u) => u._id === req.session.userId);
+  res.render("manage", { title: "Manage Habits", habits: user.habits });
 });
 
 app.post("/api/habits", isAuthenticated, async (req, res) => {
   try {
-    const { name, requiredTime, schedule } = req.body;
+    const { name, requiredTimeFormat, schedule, urls } = req.body;
     const user = isCloud
       ? await User.findById(req.session.userId)
       : UserDatabaseSim.find((u) => u._id === req.session.userId);
 
+    let calculatedHoursDecimal = 1.0;
+    if (requiredTimeFormat && requiredTimeFormat.includes(":")) {
+      const [hoursPart, minutesPart] = requiredTimeFormat.split(":");
+      calculatedHoursDecimal =
+        parseFloat(hoursPart) + parseFloat(minutesPart) / 60;
+    }
+
+    // Sanitize incoming array items to store clean strings strings
+    let cleanUrlsArray = [];
+    if (urls) {
+      const rawUrls = Array.isArray(urls) ? urls : [urls];
+      cleanUrlsArray = rawUrls.map((u) => u.trim()).filter((u) => u.length > 0);
+    }
+
     const newHabit = {
       id: Date.now().toString(),
-      name: name,
-      requiredTime: parseFloat(requiredTime) || 1,
+      name: name.trim(),
+      requiredTime: parseFloat(calculatedHoursDecimal.toFixed(2)) || 1,
       completedTime: 0,
       schedule: schedule || "",
+      urls: cleanUrlsArray, // Injected securely down into schema data blocks
     };
 
     user.habits.push(newHabit);
     if (isCloud) await user.save();
-    res.redirect("/");
+
+    res.redirect("/manage?created=success");
   } catch (err) {
     res.status(500).send("Error saving habit.");
   }
@@ -256,12 +313,122 @@ app.post("/api/diary", isAuthenticated, async (req, res) => {
 });
 
 // ==========================================================================
-// 6. SERVER RUNTIME LIFE CYCLE (PORT ENHANCED FOR CLOUD DEPLOYMENT)
+// 6. PROFILE & PROFILE ACCOUNT MANAGEMENT SUB-SYSTEM
 // ==========================================================================
-// Cloud services like Render assign ports dynamically using process.env.PORT
+app.get("/profile/details", isAuthenticated, async (req, res) => {
+  const user = isCloud
+    ? await User.findById(req.session.userId)
+    : UserDatabaseSim.find((u) => u._id === req.session.userId);
+  res.render("profile-details", { title: "Profile Details", user: user });
+});
+
+app.get("/profile/settings", isAuthenticated, async (req, res) => {
+  const user = isCloud
+    ? await User.findById(req.session.userId)
+    : UserDatabaseSim.find((u) => u._id === req.session.userId);
+  res.render("profile-setting", { title: "Account Settings", user: user });
+});
+
+app.post("/api/profile/update", isAuthenticated, async (req, res) => {
+  try {
+    const { displayName, bio, avatarUrl } = req.body;
+
+    if (isCloud) {
+      await User.findByIdAndUpdate(req.session.userId, {
+        displayName: displayName.trim(),
+        bio: bio.trim(),
+        avatarUrl: avatarUrl.trim(),
+      });
+    } else {
+      const user = UserDatabaseSim.find((u) => u._id === req.session.userId);
+      if (user) {
+        user.displayName = displayName.trim();
+        user.bio = bio.trim();
+        user.avatarUrl = avatarUrl.trim();
+      }
+    }
+    res.redirect("/profile/details");
+  } catch (err) {
+    res.status(500).send("Error updating data logs: " + err);
+  }
+});
+
+// ==========================================================================
+// 7. HABIT METRICS EDIT AND DELETION API SUB-ROUTES
+// ==========================================================================
+app.post("/api/habits/update", isAuthenticated, async (req, res) => {
+  try {
+    const { id, name, requiredTime } = req.body;
+    const user = isCloud
+      ? await User.findById(req.session.userId)
+      : UserDatabaseSim.find((u) => u._id === req.session.userId);
+
+    const habit = user.habits.find((h) => h.id === id);
+    if (habit) {
+      const oldName = habit.name;
+      habit.name = name.trim();
+      habit.requiredTime = parseFloat(requiredTime) || 1;
+
+      user.posts.forEach((post) => {
+        if (post.habitName === oldName) post.habitName = name.trim();
+      });
+
+      if (isCloud) {
+        user.markModified("habits");
+        user.markModified("posts");
+        await user.save();
+      }
+      return res.json({ success: true });
+    }
+    res.status(404).json({ success: false });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+app.post("/api/habits/delete", isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.body;
+    const user = isCloud
+      ? await User.findById(req.session.userId)
+      : UserDatabaseSim.find((u) => u._id === req.session.userId);
+
+    const habitIndex = user.habits.findIndex((h) => h.id === id);
+    if (habitIndex !== -1) {
+      const targetHabitName = user.habits[habitIndex].name;
+      user.habits.splice(habitIndex, 1);
+
+      user.posts.forEach((post) => {
+        if (post.habitName === targetHabitName) post.habitName = null;
+      });
+
+      if (isCloud) {
+        user.markModified("habits");
+        user.markModified("posts");
+        await user.save();
+      }
+      return res.json({ success: true });
+    }
+    res.status(404).json({ success: false });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+app.get("/auth/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) return res.send("Error logging out.");
+    res.redirect("/login");
+  });
+});
+
+app.use((req, res) => {
+  res.redirect("/");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   console.log(
-    `[Engine Running Online]: Live platform dashboard portal online on port ${PORT}`,
+    `[Engine Running Online]: Live platform portal active on port ${PORT}`,
   ),
 );

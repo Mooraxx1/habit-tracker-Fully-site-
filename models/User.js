@@ -25,6 +25,9 @@ const PostSchema = new mongoose.Schema({
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true, trim: true },
   password: { type: String, required: true },
+  displayName: { type: String, default: "" }, // Stores user's real name configuration
+  bio: { type: String, default: "" }, // Stores user's personalization biography details
+  avatarUrl: { type: String, default: "" }, // Stores image link URL references
   habits: [HabitSchema], // Array of habits unique to this single user account
   posts: [PostSchema], // Array of timeline logs unique to this single user account
 });

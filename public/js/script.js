@@ -1,5 +1,5 @@
 // ==========================================================================
-// 1. THEME TOGGLE (DARK / LIGHT)
+// 1. THEME TOGGLE ENGINE (DARK / LIGHT THEMES CONFIGURATOR)
 // ==========================================================================
 const themeToggle = document.getElementById("themeToggle");
 const htmlEl = document.documentElement;
@@ -24,7 +24,7 @@ if (themeToggle) {
 }
 
 // ==========================================================================
-// 2. BILINGUAL TRANSLATION ENGINE (EN / AR)
+// 2. BILINGUAL TRANSLATION LOCALIZATION SERVICE (EN / AR)
 // ==========================================================================
 const translations = {
   en: {
@@ -101,47 +101,240 @@ function applyLanguage(lang) {
 }
 
 // ==========================================================================
-// 3. Ambient 365-DAY GRID VISUALIZER
+// 3. SECURE FIXED CALENDAR YEAR GRID VISUALIZER WITH LIVE TIMER TRACKING
 // ==========================================================================
 const graphContainer = document.getElementById("activityGraph");
 
 if (graphContainer) {
-  const blocksArray = [];
-  for (let i = 0; i < 365; i++) {
-    const block = document.createElement("div");
-    block.classList.add("activity-block");
-    block.setAttribute("data-level", "0");
-    graphContainer.appendChild(block);
-    blocksArray.push(block);
+  graphContainer.innerHTML = "";
+
+  let realPostsData = [];
+  try {
+    const rawData = graphContainer.getAttribute("data-posts");
+    realPostsData = JSON.parse(rawData || "[]");
+  } catch (err) {
+    console.error("Error parsing history log updates metrics:", err);
+  }
+
+  const dateContributionMap = {};
+
+  realPostsData.forEach((post) => {
+    if (post.date) {
+      const parsedDateStr = new Date(post.date).toDateString();
+      dateContributionMap[parsedDateStr] =
+        (dateContributionMap[parsedDateStr] || 0) + 1;
+    }
+  });
+
+  const localTimerCompletions = JSON.parse(
+    localStorage.getItem("tm_completion_history") || "[]",
+  );
+  localTimerCompletions.forEach((item) => {
+    const timestamp = typeof item === "string" ? item : item.timestamp;
+    if (timestamp) {
+      const parsedDateStr = new Date(timestamp).toDateString();
+      dateContributionMap[parsedDateStr] =
+        (dateContributionMap[parsedDateStr] || 0) + 1;
+    }
+  });
+
+  const currentEngineTime = new Date();
+  const currentYearInt = currentEngineTime.getFullYear();
+
+  const baselineStartTimestamp = new Date(currentYearInt, 0, 1);
+  const startDayOffset = baselineStartTimestamp.getDay();
+  baselineStartTimestamp.setDate(
+    baselineStartTimestamp.getDate() - startDayOffset,
+  );
+
+  const trackingBlocksArray = [];
+  const totalGridCellsCount = 371;
+
+  for (let i = 0; i < totalGridCellsCount; i++) {
+    const activeCellDate = new Date(baselineStartTimestamp);
+    activeCellDate.setDate(baselineStartTimestamp.getDate() + i);
+
+    if (activeCellDate.getFullYear() > currentYearInt) {
+      const dummyBlock = document.createElement("div");
+      dummyBlock.className = "activity-block";
+      dummyBlock.style.opacity = "0.05";
+      graphContainer.appendChild(dummyBlock);
+      continue;
+    }
+
+    const keyStringMatches = activeCellDate.toDateString();
+    const countLoggedOnDate = dateContributionMap[keyStringMatches] || 0;
+
+    let contributionIntensityLevel = "0";
+    if (countLoggedOnDate > 0 && countLoggedOnDate <= 1)
+      contributionIntensityLevel = "1";
+    else if (countLoggedOnDate === 2) contributionIntensityLevel = "2";
+    else if (countLoggedOnDate === 3) contributionIntensityLevel = "3";
+    else if (countLoggedOnDate >= 4) contributionIntensityLevel = "4";
+
+    const blockElement = document.createElement("div");
+    blockElement.className = "activity-block";
+    blockElement.setAttribute(
+      "data-original-level",
+      contributionIntensityLevel,
+    );
+    blockElement.setAttribute("data-level", contributionIntensityLevel);
+    blockElement.setAttribute(
+      "title",
+      `${keyStringMatches} : ${countLoggedOnDate} activities logged`,
+    );
+
+    if (keyStringMatches === currentEngineTime.toDateString()) {
+      blockElement.style.border = "1px solid #f59e0b";
+    }
+
+    graphContainer.appendChild(blockElement);
+    trackingBlocksArray.push(blockElement);
   }
 
   setInterval(() => {
-    const randomIndex = Math.floor(Math.random() * blocksArray.length);
-    const targetBlock = blocksArray[randomIndex];
-    const randomLevel = Math.floor(Math.random() * 4) + 1;
+    const randomIndex = Math.floor(Math.random() * trackingBlocksArray.length);
+    const targetBlock = trackingBlocksArray[randomIndex];
+    if (!targetBlock) return;
 
-    targetBlock.setAttribute("data-level", randomLevel);
+    const originalIntensity = targetBlock.getAttribute("data-original-level");
+    const randomFlashLevel = Math.floor(Math.random() * 3) + 2;
+
+    targetBlock.setAttribute("data-level", randomFlashLevel.toString());
     targetBlock.classList.add("pulse-glow");
 
     setTimeout(() => {
-      targetBlock.setAttribute("data-level", "0");
+      targetBlock.setAttribute("data-level", originalIntensity);
       targetBlock.classList.remove("pulse-glow");
-    }, 1200);
-  }, 300);
+    }, 1000);
+  }, 450);
 }
 
 // ==========================================================================
-// 4. PERSISTENT SYSTEM-WIDE POMODORO TIMER CONFIGURATION
+// 3B. REACTIVE DYNAMIC SUMMARY OF ACHIEVEMENT SUBSYSTEM
 // ==========================================================================
-// Using LocalStorage caching to persist calculations across page navigation reloads
+const summaryDateInput = document.getElementById("summaryFilterDate");
+const summaryOutputGrid = document.getElementById(
+  "summaryAchievementOutputGrid",
+);
+const habitsContainerEl = document.getElementById("habitsListCardContainer");
+
+if (summaryDateInput && summaryOutputGrid && habitsContainerEl) {
+  const todayObject = new Date();
+  const localYear = todayObject.getFullYear();
+  const localMonth = String(todayObject.getMonth() + 1).padStart(2, "0");
+  const localDay = String(todayObject.getDate()).padStart(2, "0");
+
+  summaryDateInput.value = `${localYear}-${localMonth}-${localDay}`;
+
+  summaryDateInput.addEventListener(
+    "change",
+    processAchievementSummaryFiltering,
+  );
+  processAchievementSummaryFiltering();
+}
+
+function processAchievementSummaryFiltering() {
+  if (!summaryDateInput || !summaryOutputGrid || !habitsContainerEl) return;
+
+  summaryOutputGrid.innerHTML = "";
+
+  const [year, month, day] = summaryDateInput.value.split("-");
+  const selectedFilterDateString = new Date(
+    year,
+    month - 1,
+    day,
+  ).toDateString();
+
+  let baseHabitsArray = [];
+  try {
+    baseHabitsArray = JSON.parse(
+      habitsContainerEl.getAttribute("data-habits") || "[]",
+    );
+  } catch (e) {
+    console.error(e);
+  }
+
+  const completedTimerHistory = JSON.parse(
+    localStorage.getItem("tm_completion_history") || "[]",
+  );
+  const aggregatedMinutesPerHabitMap = {};
+
+  completedTimerHistory.forEach((item) => {
+    const timestamp = typeof item === "string" ? item : item.timestamp;
+    const habitId =
+      typeof item === "object"
+        ? item.habitId
+        : localStorage.getItem("tm_selectedHabit");
+    const minutes =
+      typeof item === "object"
+        ? item.minutes
+        : parseInt(localStorage.getItem("tm_workValue")) || 25;
+
+    if (
+      timestamp &&
+      new Date(timestamp).toDateString() === selectedFilterDateString
+    ) {
+      aggregatedMinutesPerHabitMap[habitId] =
+        (aggregatedMinutesPerHabitMap[habitId] || 0) + minutes;
+    }
+  });
+
+  let renderedCardsCount = 0;
+
+  baseHabitsArray.forEach((habit) => {
+    const totalMinutesLoggedToday = aggregatedMinutesPerHabitMap[habit.id] || 0;
+
+    if (totalMinutesLoggedToday > 0) {
+      renderedCardsCount++;
+      const completedHours = parseFloat(
+        (totalMinutesLoggedToday / 60).toFixed(2),
+      );
+      const safeRequired = habit.requiredTime || 1;
+      const dynamicPercentage = Math.min(
+        Math.round((completedHours / safeRequired) * 100),
+        100,
+      );
+
+      const cardNode = document.createElement("div");
+      cardNode.className = "stat-card";
+      cardNode.innerHTML = `
+                <div class="circle" style="--percentage: ${dynamicPercentage}%;">
+                    <span>${dynamicPercentage}%</span>
+                </div>
+                <h4 style="color: var(--text-main); margin-bottom: 0.25rem;">${habit.name}</h4>
+                <p style="color: var(--primary); font-weight: 700; font-size: 0.9rem;">${completedHours} hrs tracked</p>
+            `;
+      summaryOutputGrid.appendChild(cardNode);
+    }
+  });
+
+  if (renderedCardsCount === 0) {
+    const [y, m, d] = summaryDateInput.value.split("-");
+    const formattedDisplayDate = new Date(y, m - 1, d).toLocaleDateString(
+      undefined,
+      { month: "short", day: "numeric", year: "numeric" },
+    );
+
+    summaryOutputGrid.innerHTML = `
+            <p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-style: italic; padding: 2rem 0;">
+                No active focus tracking sessions logged on ${formattedDisplayDate}.
+            </p>
+        `;
+  }
+}
+
+// ==========================================================================
+// 4. PERSISTENT SYSTEM-WIDE POMODORO TIMER MANAGEMENT HUB CONFIGURATION
+// ==========================================================================
 let isRunning = localStorage.getItem("tm_isRunning") === "true";
-let isWorkSession = localStorage.getItem("tm_isWorkSession") !== "false"; // Default to true
+let isWorkSession = localStorage.getItem("tm_isWorkSession") !== "false";
 let totalDuration =
   parseInt(localStorage.getItem("tm_totalDuration")) || 25 * 60;
 let timeLeft = parseInt(localStorage.getItem("tm_timeLeft")) || totalDuration;
 let endTime = parseInt(localStorage.getItem("tm_endTime")) || 0;
+let currentRoundIdx = parseInt(localStorage.getItem("tm_currentRoundIdx")) || 0;
 
-// Gather structural DOM pointers for both Main view elements and Mini elements
 const timeDisplay = document.getElementById("timeDisplay");
 const startBtn = document.getElementById("startBtn");
 const resetBtn = document.getElementById("resetBtn");
@@ -156,27 +349,32 @@ const miniStartBtn = document.getElementById("miniStartBtn");
 const miniResetBtn = document.getElementById("miniResetBtn");
 const miniSessionStatus = document.getElementById("miniSessionStatus");
 
+const timelineTrack = document.getElementById("timelineTrack");
+const timelineIndicator = document.getElementById("timelineIndicator");
+const timelineCompletionPercent = document.getElementById(
+  "timelineCompletionPercent",
+);
+
+const customResetModal = document.getElementById("customResetModal");
+const confirmResetBtn = document.getElementById("confirmResetBtn");
+const cancelResetBtn = document.getElementById("cancelResetBtn");
+
 const CIRCUMFERENCE = 565.48;
 let systemTimerInterval;
-
-// Route Identification Switch
 const isTimerPage = !!timeDisplay;
 
 function initGlobalTimerState() {
-  // If the timer was left running when we switched tabs, calculate the elapsed time gap
   if (isRunning && endTime > 0) {
     const remainingDelta = Math.round((endTime - Date.now()) / 1000);
     if (remainingDelta > 0) {
       timeLeft = remainingDelta;
     } else {
-      // Timer expired while away
       timeLeft = 0;
       executeSessionCompletion();
       return;
     }
   }
 
-  // Configure initial field states if on the settings view
   if (isTimerPage && workInput && breakInput) {
     workInput.value = localStorage.getItem("tm_workValue") || "25";
     breakInput.value = localStorage.getItem("tm_breakValue") || "5";
@@ -186,6 +384,7 @@ function initGlobalTimerState() {
       localStorage.getItem("tm_selectedHabit") || "";
   }
 
+  renderTimelineTrackStructure();
   updateGlobalUIs();
   evaluateOverlayVisibility();
 
@@ -194,17 +393,43 @@ function initGlobalTimerState() {
   }
 }
 
+function renderTimelineTrackStructure() {
+  if (!isTimerPage || !timelineTrack) return;
+
+  const segments = timelineTrack.querySelectorAll(".timeline-segment");
+  segments.forEach((s) => s.remove());
+
+  const wMins = parseInt(localStorage.getItem("tm_workValue")) || 25;
+  const bMins = parseInt(localStorage.getItem("tm_breakValue")) || 5;
+  const totalRounds = parseInt(localStorage.getItem("tm_sessionsValue")) || 4;
+
+  const totalSessionMinutes = wMins * totalRounds + bMins * totalRounds;
+
+  for (let i = 0; i < totalRounds; i++) {
+    const focusW = (wMins / totalSessionMinutes) * 100;
+    const fSeg = document.createElement("div");
+    fSeg.className = "timeline-segment segment-focus";
+    fSeg.style.width = `${focusW}%`;
+    fSeg.innerText = `R${i + 1} Focus`;
+    timelineTrack.appendChild(fSeg);
+
+    const breakW = (bMins / totalSessionMinutes) * 100;
+    const bSeg = document.createElement("div");
+    bSeg.className = "timeline-segment segment-break";
+    bSeg.style.width = `${breakW}%`;
+    bSeg.innerText = `B${i + 1}`;
+    timelineTrack.appendChild(bSeg);
+  }
+}
+
 function updateGlobalUIs() {
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
   const formattedTextString = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
-  // Update Main clock text if it exists
   if (timeDisplay) timeDisplay.innerText = formattedTextString;
-  // Update Floating mini bar text if it exists
   if (miniTimeDisplay) miniTimeDisplay.innerText = formattedTextString;
 
-  // Synchronize text label blocks
   const focusLabel = currentLang === "ar" ? "وقت التركيز!" : "Focus Time!";
   const breakLabel = currentLang === "ar" ? "خذ استراحة!" : "Take a Break!";
   const readyLabel =
@@ -213,12 +438,12 @@ function updateGlobalUIs() {
       : translations.en.status_ready;
 
   let currentStatusText = isWorkSession ? focusLabel : breakLabel;
-  if (timeLeft === totalDuration && !isRunning) currentStatusText = readyLabel;
+  if (timeLeft === totalDuration && !isRunning && currentRoundIdx === 0)
+    currentStatusText = readyLabel;
 
   if (sessionStatus) sessionStatus.innerText = currentStatusText;
   if (miniSessionStatus) miniSessionStatus.innerText = currentStatusText;
 
-  // Render SVG SVG animation if visible
   if (progressRing) {
     const progressFraction = timeLeft / totalDuration;
     const offset = CIRCUMFERENCE * (1 - progressFraction);
@@ -238,7 +463,34 @@ function updateGlobalUIs() {
     }
   }
 
-  // Synchronize action buttons context words
+  if (isTimerPage && timelineIndicator && timelineCompletionPercent) {
+    const wMins = parseInt(localStorage.getItem("tm_workValue")) || 25;
+    const bMins = parseInt(localStorage.getItem("tm_breakValue")) || 5;
+    const totalRounds = parseInt(localStorage.getItem("tm_sessionsValue")) || 4;
+
+    const totalSessionSeconds =
+      (wMins * totalRounds + bMins * totalRounds) * 60;
+
+    let accumulatedSeconds = 0;
+    for (let i = 0; i < currentRoundIdx; i++) {
+      accumulatedSeconds += wMins * 60 + bMins * 60;
+    }
+
+    if (!isWorkSession) {
+      accumulatedSeconds += wMins * 60;
+      accumulatedSeconds += bMins * 60 - timeLeft;
+    } else {
+      accumulatedSeconds += wMins * 60 - timeLeft;
+    }
+
+    const linearGlobalPercentage = Math.min(
+      (accumulatedSeconds / totalSessionSeconds) * 100,
+      100,
+    );
+    timelineIndicator.style.left = `${linearGlobalPercentage}%`;
+    timelineCompletionPercent.innerText = `Completion: ${Math.round(linearGlobalPercentage)}%`;
+  }
+
   const startText =
     currentLang === "ar"
       ? translations.ar.btn_start
@@ -248,7 +500,8 @@ function updateGlobalUIs() {
 
   let btnLabel = startText;
   if (isRunning) btnLabel = pauseText;
-  else if (timeLeft < totalDuration) btnLabel = resumeText;
+  else if (timeLeft < totalDuration || currentRoundIdx > 0)
+    btnLabel = resumeText;
 
   if (startBtn) startBtn.innerText = btnLabel;
   if (miniStartBtn) miniStartBtn.innerText = btnLabel;
@@ -257,12 +510,10 @@ function updateGlobalUIs() {
 function evaluateOverlayVisibility() {
   if (!miniTimerOverlay) return;
 
-  // Check if the user is currently on the login or registration authentication pages
   const isAuthPage =
     window.location.pathname === "/login" ||
     window.location.pathname === "/register";
 
-  // Condition: Hide the overlay if on the timer page OR if logged out on auth screens
   if (isTimerPage || isAuthPage) {
     miniTimerOverlay.classList.add("hidden-overlay");
   } else {
@@ -273,7 +524,6 @@ function evaluateOverlayVisibility() {
 function startTimerEngineLoop() {
   clearInterval(systemTimerInterval);
 
-  // Set absolute timestamp target point used as single source of truth configuration
   if (endTime <= 0 || !localStorage.getItem("tm_endTime")) {
     endTime = Date.now() + timeLeft * 1000;
     localStorage.setItem("tm_endTime", endTime.toString());
@@ -295,6 +545,26 @@ function startTimerEngineLoop() {
   }, 1000);
 }
 
+function triggerWebNotificationCard(headerTitle, messageContent, iconTheme) {
+  const oldModal = document.getElementById("webCompletionNotifyCard");
+  if (oldModal) oldModal.remove();
+
+  const modalBox = document.createElement("div");
+  modalBox.id = "webCompletionNotifyCard";
+  modalBox.style =
+    "display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center;";
+
+  modalBox.innerHTML = `
+        <div class="card" style="max-width: 440px; width: 90%; text-align: center; padding: 2.5rem; border-radius: 14px; border: 1px solid var(--border); background-color: var(--card-bg); box-shadow: var(--shadow);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">${iconTheme}</div>
+            <h3 style="margin-bottom: 0.75rem; color: var(--text-main); font-weight: 800; font-size: 1.4rem;">${headerTitle}</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;">${messageContent}</p>
+            <button onclick="document.getElementById('webCompletionNotifyCard').remove()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; font-size: 1rem; border-radius: 6px;">Continue</button>
+        </div>
+    `;
+  document.body.appendChild(modalBox);
+}
+
 function executeSessionCompletion() {
   playAlarmSound();
   isRunning = false;
@@ -305,9 +575,35 @@ function executeSessionCompletion() {
   const cachedHabitId = localStorage.getItem("tm_selectedHabit");
   const cachedWorkMinutes =
     parseInt(localStorage.getItem("tm_workValue")) || 25;
+  const totalRoundsSetting =
+    parseInt(localStorage.getItem("tm_sessionsValue")) || 4;
 
-  // Credit session completion data back to server
+  let habitTargetHours = 1;
+  const habitsContainerEl = document.getElementById("habitsListCardContainer");
+  if (habitsContainerEl) {
+    try {
+      const habitsArr = JSON.parse(
+        habitsContainerEl.getAttribute("data-habits") || "[]",
+      );
+      const activeHabit = habitsArr.find((h) => h.id === cachedHabitId);
+      if (activeHabit) habitTargetHours = activeHabit.requiredTime || 1;
+    } catch (e) {}
+  }
+
   if (isWorkSession && cachedHabitId) {
+    const ongoingHistory = JSON.parse(
+      localStorage.getItem("tm_completion_history") || "[]",
+    );
+    ongoingHistory.push({
+      timestamp: new Date().toString(),
+      habitId: cachedHabitId,
+      minutes: cachedWorkMinutes,
+    });
+    localStorage.setItem(
+      "tm_completion_history",
+      JSON.stringify(ongoingHistory),
+    );
+
     fetch("/api/habits/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -321,11 +617,62 @@ function executeSessionCompletion() {
       .catch((err) => console.error("Data Sync failure:", err));
   }
 
-  // Toggle cycle modes
+  if (!isWorkSession) {
+    currentRoundIdx++;
+    localStorage.setItem("tm_currentRoundIdx", currentRoundIdx.toString());
+  }
+
+  const todayDateString = new Date().toDateString();
+  const historyList = JSON.parse(
+    localStorage.getItem("tm_completion_history") || "[]",
+  );
+  let totalMinutesLoggedToday = 0;
+
+  historyList.forEach((item) => {
+    const ts = typeof item === "string" ? item : item.timestamp;
+    const hId =
+      typeof item === "object"
+        ? item.habitId
+        : localStorage.getItem("tm_selectedHabit");
+    const mins = typeof item === "object" ? item.minutes : cachedWorkMinutes;
+
+    if (
+      ts &&
+      new Date(ts).toDateString() === todayDateString &&
+      hId === cachedHabitId
+    ) {
+      totalMinutesLoggedToday += mins;
+    }
+  });
+
+  const totalHoursLoggedToday = totalMinutesLoggedToday / 60;
+
+  if (currentRoundIdx >= totalRoundsSetting) {
+    if (totalHoursLoggedToday >= habitTargetHours) {
+      triggerWebNotificationCard(
+        "Target Achieved! 🏆",
+        "You did it! You achieved your required daily target hours milestone for this routine perfectly!",
+        "🎯",
+      );
+    } else {
+      triggerWebNotificationCard(
+        "GREAT JOB! 🎉",
+        "Fantastic work! You completed the entire planned multi-round session sequence exactly as structured.",
+        "💪",
+      );
+    }
+    resetTimerTrigger(true);
+    return;
+  } else {
+    const cycleText = isWorkSession
+      ? "Focus interval completed! Time to slide into your restorative break phase row."
+      : "Break cycle finished! Re-align focus vectors for the next segment.";
+    triggerWebNotificationCard("Interval Matrix Crossed", cycleText, "⏱️");
+  }
+
   isWorkSession = !isWorkSession;
   localStorage.setItem("tm_isWorkSession", isWorkSession.toString());
 
-  // Pull configuration parameters to step setup next run instances bounds
   const workMinutesSetting =
     parseInt(localStorage.getItem("tm_workValue")) || 25;
   const breakMinutesSetting =
@@ -343,7 +690,6 @@ function executeSessionCompletion() {
 
 function toggleTimerTrigger() {
   if (isRunning) {
-    // Halt Execution Logic Chain
     clearInterval(systemTimerInterval);
     isRunning = false;
     endTime = 0;
@@ -351,7 +697,6 @@ function toggleTimerTrigger() {
     localStorage.removeItem("tm_endTime");
     updateGlobalUIs();
   } else {
-    // Fire Processing Sequences
     isRunning = true;
     localStorage.setItem("tm_isRunning", "true");
     startTimerEngineLoop();
@@ -359,14 +704,30 @@ function toggleTimerTrigger() {
   }
 }
 
-function resetTimerTrigger() {
+function openResetModal() {
+  if (customResetModal) customResetModal.style.display = "flex";
+}
+
+function closeResetModal() {
+  if (customResetModal) customResetModal.style.display = "none";
+}
+
+function resetTimerTrigger(bypassConfirm = false) {
+  if (bypassConfirm !== true) {
+    openResetModal();
+    return;
+  }
+
+  closeResetModal();
   clearInterval(systemTimerInterval);
   isRunning = false;
   isWorkSession = true;
   endTime = 0;
+  currentRoundIdx = 0;
 
   localStorage.setItem("tm_isRunning", "false");
   localStorage.setItem("tm_isWorkSession", "true");
+  localStorage.setItem("tm_currentRoundIdx", "0");
   localStorage.removeItem("tm_endTime");
 
   const workMins = workInput
@@ -378,14 +739,20 @@ function resetTimerTrigger() {
   localStorage.setItem("tm_totalDuration", totalDuration.toString());
   localStorage.setItem("tm_timeLeft", timeLeft.toString());
 
+  renderTimelineTrackStructure();
   updateGlobalUIs();
 }
 
-// Bind Action Listeners to interface controls
 if (startBtn) startBtn.addEventListener("click", toggleTimerTrigger);
 if (miniStartBtn) miniStartBtn.addEventListener("click", toggleTimerTrigger);
-if (resetBtn) resetBtn.addEventListener("click", resetTimerTrigger);
-if (miniResetBtn) miniResetBtn.addEventListener("click", resetTimerTrigger);
+
+if (resetBtn)
+  resetBtn.addEventListener("click", () => resetTimerTrigger(false));
+if (miniResetBtn)
+  miniResetBtn.addEventListener("click", () => resetTimerTrigger(false));
+if (confirmResetBtn)
+  confirmResetBtn.addEventListener("click", () => resetTimerTrigger(true));
+if (cancelResetBtn) cancelResetBtn.addEventListener("click", closeResetModal);
 
 if (isTimerPage && workInput && breakInput) {
   function saveInputsToStorage() {
@@ -400,7 +767,7 @@ if (isTimerPage && workInput && breakInput) {
       document.getElementById("habitSelect").value,
     );
 
-    if (!isRunning) {
+    if (!isRunning && currentRoundIdx === 0) {
       const activeMins = isWorkSession
         ? parseInt(workInput.value)
         : parseInt(breakInput.value);
@@ -409,6 +776,7 @@ if (isTimerPage && workInput && breakInput) {
       timeLeft = totalDuration;
       localStorage.setItem("tm_totalDuration", totalDuration.toString());
       localStorage.setItem("tm_timeLeft", timeLeft.toString());
+      renderTimelineTrackStructure();
       updateGlobalUIs();
     }
   }
@@ -423,11 +791,95 @@ if (isTimerPage && workInput && breakInput) {
     .addEventListener("change", saveInputsToStorage);
 }
 
-// Start context parsing
 initGlobalTimerState();
 
 // ==========================================================================
-// 5. SYNTHETIC AUDIO GENERATOR (WEB AUDIO API)
+// 4B. APPENDED TAIL END: REACTIVE GOAL VERIFICATION PLAN CALCULATOR
+// ==========================================================================
+const calcSelectElement = document.getElementById("habitSelect");
+const calcWorkTimeElement = document.getElementById("workTime");
+const calcSessionsElement = document.getElementById("sessions");
+const calcOutputPanelWrapper = document.getElementById(
+  "goalCalcTextOutputWrapper",
+);
+const targetHabitContainerElement = document.getElementById(
+  "habitsListCardContainer",
+);
+
+if (
+  calcSelectElement &&
+  calcWorkTimeElement &&
+  calcSessionsElement &&
+  calcOutputPanelWrapper &&
+  targetHabitContainerElement
+) {
+  function recomputeInteractiveGoalPlan() {
+    const structuralHabitId = calcSelectElement.value;
+    if (!structuralHabitId) {
+      calcOutputPanelWrapper.innerHTML = `<p style="color: var(--text-muted); font-style: italic; font-size: 0.9rem; text-align: center; padding: 1rem 0;">Select an initialized habit above to activate live goal calculation maps.</p>`;
+      return;
+    }
+
+    let habitsRegistryData = [];
+    try {
+      habitsRegistryData = JSON.parse(
+        targetHabitContainerElement.getAttribute("data-habits") || "[]",
+      );
+    } catch (e) {
+      console.error(e);
+    }
+
+    const chosenHabitObject = habitsRegistryData.find(
+      (h) => h.id === structuralHabitId,
+    );
+    if (!chosenHabitObject) return;
+
+    const totalTargetHoursRequired = chosenHabitObject.requiredTime || 1;
+    const totalTargetMinutesRequired = totalTargetHoursRequired * 60;
+
+    const inputWorkDurationMinutes = parseInt(calcWorkTimeElement.value) || 0;
+    const inputRoundsCountSetting = parseInt(calcSessionsElement.value) || 0;
+    const plannedProductionMinutes =
+      inputWorkDurationMinutes * inputRoundsCountSetting;
+
+    const reqH = Math.floor(totalTargetMinutesRequired / 60);
+    const reqM = Math.round(totalTargetMinutesRequired % 60);
+    const reqDisplayStr = `${reqH}H : ${reqM.toString().padStart(2, "0")}M`;
+
+    if (plannedProductionMinutes >= totalTargetMinutesRequired) {
+      calcOutputPanelWrapper.innerHTML = `
+                <div style="text-align: center; padding: 0.5rem 0;">
+                    <p style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main);">Target Habit: <span style="color: var(--primary);">${chosenHabitObject.name}</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Total Requirement: <strong>${reqDisplayStr}</strong></p>
+                    <div style="background-color: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 0.95rem;">
+                        🎉 That's exact what you need, good to go!
+                    </div>
+                </div>
+            `;
+    } else {
+      const missingMinutesDelta =
+        totalTargetMinutesRequired - plannedProductionMinutes;
+      const deltaH = Math.floor(missingMinutesDelta / 60);
+      const deltaM = Math.round(missingMinutesDelta % 60);
+      const deltaDisplayStr = `${deltaH}H : ${deltaM.toString().padStart(2, "0")}M`;
+
+      calcOutputPanelWrapper.innerHTML = `
+                <div style="text-align: left; padding: 0.25rem 0;">
+                    <p style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main);">Routine: <span style="color: var(--primary);">${chosenHabitObject.name}</span></p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Daily Goal: <strong>${reqDisplayStr}</strong></p>
+                    <p style="font-size: 0.9rem; line-height: 1.4; color: var(--text-main);">To achieve your target layout thresholds, you still need to add more <strong style="color: var(--danger); font-family: monospace; font-size: 1rem;">${deltaDisplayStr}</strong> into your planned focus rounds configuration block.</p>
+                </div>
+            `;
+    }
+  }
+
+  calcSelectElement.addEventListener("change", recomputeInteractiveGoalPlan);
+  calcWorkTimeElement.addEventListener("input", recomputeInteractiveGoalPlan);
+  calcSessionsElement.addEventListener("input", recomputeInteractiveGoalPlan);
+}
+
+// ==========================================================================
+// 5. SYNTHETIC AUDIO GENERATOR LAYER (WEB AUDIO API ENGINE)
 // ==========================================================================
 function playAlarmSound() {
   try {
@@ -456,3 +908,28 @@ function playAlarmSound() {
     );
   }
 }
+
+// ==========================================================================
+// 6. NAVIGATION INTERACTION DROPDOWN LAYOUT HANDLER
+// ==========================================================================
+function toggleProfileMenu(event) {
+  event.stopPropagation();
+  const menu = document.getElementById("profileMenu");
+  if (menu.style.display === "none" || menu.style.display === "") {
+    menu.style.display = "block";
+  } else {
+    menu.style.display = "none";
+  }
+}
+
+window.addEventListener("click", function (event) {
+  const menu = document.getElementById("profileMenu");
+  if (menu && menu.style.display === "block") {
+    if (
+      !event.target.matches(".btn-profile") &&
+      !event.target.closest("#profileMenu")
+    ) {
+      menu.style.display = "none";
+    }
+  }
+});
