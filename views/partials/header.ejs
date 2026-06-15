@@ -1,64 +1,25 @@
-<%- include('partials/header') %>
-
-<div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
-    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);">Manage Habits</h1>
-    <button onclick="document.getElementById('addHabitModal').style.display='flex'" class="btn btn-primary" style="padding: 10px 20px; border-radius: 6px; font-weight: 600;">+ Create New Habit</button>
-</div>
-
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
-    <% if (habits && habits.length > 0) { %>
-        <% habits.forEach(habit => { %>
-            <div class="card" style="border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); background-color: var(--card-bg);">
-                <div>
-                    <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 700;"><%= habit.name %></h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Schedule: <%= habit.schedule || 'Daily' %></p>
-                </div>
-                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button class="btn" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); width: 100%; padding: 8px; font-weight: 600; border-radius: 6px; cursor: pointer;" onclick="triggerDeleteConfirmation('<%= habit.id %>', '<%= habit.name %>')">Delete</button>
-                </div>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'DevMoor Habit Tracker' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="site-wrapper">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/">DevMoor</a>
             </div>
-        <% }) %>
-    <% } else { %>
-        <p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 3rem 0;">No tracking habits configured. Click create above to initialize your tracking matrix routine.</p>
-    <% } %>
-</div>
-
-<div id="deleteConfirmationModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 2000;">
-    <div class="card" style="max-width: 420px; width: 90%; text-align: center; padding: 2rem; border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 12px; background-color: var(--card-bg);">
-        <div style="width: 56px; height: 56px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">!</div>
-        <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 700;">Remove Routine?</h3>
-        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 2rem;">
-            Are you sure you want to delete <span id="deleteTargetHabitName" style="color: var(--primary); font-weight: 700;"></span>? This historical analytics logging tracking cannot be undone.
-        </p>
-        <div style="display: flex; gap: 1rem;">
-            <button type="button" class="btn" style="background: var(--border); color: var(--text-main); width: 100%; padding: 12px; font-weight: 600; border-radius: 6px; cursor: pointer;" onclick="closeDeleteModal()">Cancel</button>
-            <button id="confirmDeleteButton" type="button" class="btn" style="background: #ef4444; color: #ffffff; width: 100%; padding: 12px; font-weight: 600; border-radius: 6px; cursor: pointer;">Confirm Delete</button>
-        </div>
-    </div>
-</div>
-
-<div id="addHabitModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000;">
-    <div class="card" style="max-width: 500px; width: 90%; border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 12px; padding: 2rem; background-color: var(--card-bg);">
-        <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 700; color: var(--text-main);">Create New Tracking Habit</h2>
-        <form action="/api/habits" method="POST">
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-                <label style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--text-main);">Habit Routine Name</label>
-                <input type="text" name="name" placeholder="E.g., Deep Work Coding" required style="width: 100%; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: 6px;">
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/manage">Manage</a>
+                <a href="/timer">Timer</a>
+                <a href="/diary">Diary</a>
+                <a href="/profile/details">Profile</a>
+                <button id="themeToggle" class="btn" style="background: var(--border); color: var(--text-main); padding: 6px 12px; margin-left: 10px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; border: none;">🌓 Theme</button>
+                <a href="/auth/logout" style="margin-left: 15px; color: var(--danger); font-weight: 700;">Logout</a>
             </div>
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-                <label style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--text-main);">Target Duration Allocation (HH:MM)</label>
-                <input type="text" name="requiredTimeFormat" placeholder="02:00" required style="width: 100%; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: 6px;">
-            </div>
-            <div class="form-group" style="margin-bottom: 1.5rem;">
-                <label style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--text-main);">Frequency Schedule Mapping</label>
-                <input type="text" name="schedule" placeholder="Daily or Mon-Fri" style="width: 100%; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: 6px;">
-            </div>
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button type="button" class="btn" style="background: var(--border); color: var(--text-main); padding: 10px 16px; border-radius: 6px; cursor: pointer;" onclick="document.getElementById('addHabitModal').style.display='none'">Cancel</button>
-                <button type="submit" class="btn btn-primary" style="padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;">Save Routine</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<%- include('partials/footer') %>
+        </nav>
+        <main class="container">

@@ -32,23 +32,32 @@ console.log(
 );
 
 if (!MONGO_URI) {
-  console.error("[Database Engine]: CRITICAL - MONGODB_URI is not set. Halting.");
+  console.error(
+    "[Database Engine]: CRITICAL - MONGODB_URI is not set. Halting.",
+  );
   process.exit(1);
 }
 
 mongoose
   .connect(MONGO_URI)
   .then(() =>
-    console.log("[Database Engine]: SUCCESS - Connected to MongoDB Atlas Cloud."),
+    console.log(
+      "[Database Engine]: SUCCESS - Connected to MongoDB Atlas Cloud.",
+    ),
   )
   .catch((err) =>
-    console.error("[Database Engine]: CRITICAL ERROR - Connection failed ->", err),
+    console.error(
+      "[Database Engine]: CRITICAL ERROR - Connection failed ->",
+      err,
+    ),
   );
 
 // ==========================================================================
 // 3. PERSISTENT SESSION MIDDLEWARE (AUTO-DETECTING CONNECT-MONGO VERSION)
 // ==========================================================================
-console.log("[Session Engine]: Constructing MongoStore session configuration...");
+console.log(
+  "[Session Engine]: Constructing MongoStore session configuration...",
+);
 
 let sessionStore;
 
@@ -56,14 +65,18 @@ try {
   const ConnectMongo = require("connect-mongo");
 
   if (typeof ConnectMongo.create === "function") {
-    console.log("[Session Engine]: Detected connect-mongo v4+ → using .create()");
+    console.log(
+      "[Session Engine]: Detected connect-mongo v4+ → using .create()",
+    );
     sessionStore = ConnectMongo.create({
       mongoUrl: MONGO_URI,
       collectionName: "sessions",
       ttl: 14 * 24 * 60 * 60,
     });
   } else if (typeof ConnectMongo === "function") {
-    console.log("[Session Engine]: Detected connect-mongo v3 → using factory pattern");
+    console.log(
+      "[Session Engine]: Detected connect-mongo v3 → using factory pattern",
+    );
     const MongoStoreV3 = ConnectMongo(session);
     sessionStore = new MongoStoreV3({
       url: MONGO_URI,
@@ -74,7 +87,10 @@ try {
     throw new Error("Unrecognized connect-mongo export shape.");
   }
 } catch (err) {
-  console.error("[Session Engine]: CRITICAL - Could not initialize MongoStore:", err.message);
+  console.error(
+    "[Session Engine]: CRITICAL - Could not initialize MongoStore:",
+    err.message,
+  );
   console.warn("[Session Engine]: Falling back to in-memory MemoryStore.");
   sessionStore = undefined;
 }
@@ -91,7 +107,9 @@ app.use(
   }),
 );
 
-console.log("[Session Engine]: Middleware attached to express execution lifecycle.");
+console.log(
+  "[Session Engine]: Middleware attached to express execution lifecycle.",
+);
 
 // ==========================================================================
 // 4. ROUTE GUARD
@@ -112,12 +130,20 @@ app.post("/auth/register", async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
-      return res.render("register", { error: "Username and password are required.", successUser: null });
+      return res.render("register", {
+        title: "Register",
+        error: "Username and password are required.",
+        successUser: null,
+      });
     }
     const cleanUsername = username.trim().toLowerCase();
     const existingUser = await User.findOne({ username: cleanUsername });
     if (existingUser) {
-      return res.render("register", { error: "Username is already taken. Please choose another.", successUser: null });
+      return res.render("register", {
+        title: "Register",
+        error: "Username is already taken. Please choose another.",
+        successUser: null,
+      });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -127,25 +153,48 @@ app.post("/auth/register", async (req, res) => {
       posts: [],
     });
     await newUser.save();
-    res.render("register", { error: null, successUser: cleanUsername });
+    res.render("register", {
+      title: "Register",
+      error: null,
+      successUser: cleanUsername,
+    });
   } catch (err) {
-    res.render("register", { error: "System error during registration: " + err.message, successUser: null });
+    res.render("register", {
+      title: "Register",
+      error: "System error during registration: " + err.message,
+      successUser: null,
+    });
   }
 });
 
 app.post("/auth/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password) return res.render("login", { error: "Username and password are required." });
+    if (!username || !password)
+      return res.render("login", {
+        title: "Login",
+        error: "Username and password are required.",
+      });
     const cleanUsername = username.trim().toLowerCase();
     const user = await User.findOne({ username: cleanUsername });
-    if (!user) return res.render("login", { error: "User not found. Please check your username." });
+    if (!user)
+      return res.render("login", {
+        title: "Login",
+        error: "User not found. Please check your username.",
+      });
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.render("login", { error: "Incorrect password. Please try again." });
+    if (!isMatch)
+      return res.render("login", {
+        title: "Login",
+        error: "Incorrect password. Please try again.",
+      });
     req.session.userId = user._id.toString();
     res.redirect("/");
   } catch (err) {
-    res.render("login", { error: "System error during login: " + err.message });
+    res.render("login", {
+      title: "Login",
+      error: "System error during login: " + err.message,
+    });
   }
 });
 
@@ -190,8 +239,11 @@ app.get("/diary", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
     if (!user) return res.redirect("/auth/logout");
-    // FIXED: Passed user habits array down to prevent EJS loop compilation errors
-    res.render("diary", { title: "My Diary Wall", posts: user.posts, habits: user.habits });
+    res.render("diary", {
+      title: "My Diary Wall",
+      posts: user.posts,
+      habits: user.habits,
+    });
   } catch (err) {
     res.redirect("/");
   }
@@ -257,21 +309,23 @@ app.post("/api/habits", isAuthenticated, async (req, res) => {
   }
 });
 
-// FIXED: Added inline modification update route used by manage.ejs dialogs
 app.post("/api/habits/update", isAuthenticated, async (req, res) => {
   try {
     const { id, name, requiredTime } = req.body;
     const user = await User.findById(req.session.userId);
-    if (!user) return res.status(401).json({ success: false, message: "Unauthorized" });
+    if (!user)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    const habit = user.habits.find(h => h.id === id);
+    const habit = user.habits.find((h) => h.id === id);
     if (habit) {
       habit.name = name;
       habit.requiredTime = parseFloat(requiredTime);
       await user.save();
       return res.json({ success: true });
     }
-    res.status(404).json({ success: false, message: "Habit routine not found" });
+    res
+      .status(404)
+      .json({ success: false, message: "Habit routine not found" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -280,7 +334,8 @@ app.post("/api/habits/update", isAuthenticated, async (req, res) => {
 app.delete("/api/habits/:id", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
-    if (!user) return res.status(401).json({ success: false, message: "Unauthorized" });
+    if (!user)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
 
     user.habits = user.habits.filter((habit) => habit.id !== req.params.id);
     await user.save();
@@ -290,7 +345,6 @@ app.delete("/api/habits/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// FIXED: Appended missing diary wall submission logging handler
 app.post("/api/diary", isAuthenticated, async (req, res) => {
   try {
     const { content, habitTagged } = req.body;
@@ -299,13 +353,20 @@ app.post("/api/diary", isAuthenticated, async (req, res) => {
 
     let matchedHabitName = null;
     if (habitTagged && habitTagged.trim() !== "") {
-      const targetHabit = user.habits.find(h => h.id === habitTagged);
+      const targetHabit = user.habits.find((h) => h.id === habitTagged);
       if (targetHabit) matchedHabitName = targetHabit.name;
     }
 
     const currentDateObj = new Date();
-    const formattedDate = currentDateObj.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
-    const formattedTime = currentDateObj.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
+    const formattedDate = currentDateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const formattedTime = currentDateObj.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     user.posts.unshift({
       id: Date.now().toString(),
@@ -313,13 +374,12 @@ app.post("/api/diary", isAuthenticated, async (req, res) => {
       time: formattedTime,
       content: content.trim(),
       habitName: matchedHabitName,
-      imageUrl: null // Defaults cleanly without multipart complexity configuration crash points
+      imageUrl: null,
     });
 
     await user.save();
     res.redirect("/diary");
   } catch (err) {
-    console.error("[Diary Post Engine]: Error saving update:", err.message);
     res.status(500).send("Error compiling diary post logs.");
   }
 });
@@ -328,8 +388,9 @@ app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
   try {
     const { habitId, minutesWorked } = req.body;
     const user = await User.findById(req.session.userId);
-    if (!user) return res.status(401).json({ success: false, message: "Unauthorized" });
-    
+    if (!user)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+
     const habit = user.habits.find((h) => h.id === habitId);
     if (habit) {
       habit.completedTime = Math.min(
@@ -349,11 +410,17 @@ app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
 // ==========================================================================
 // 7. UTILITY ROUTES
 // ==========================================================================
-app.get("/login", (req, res) => res.render("login", { title: "Login", error: null }));
-app.get("/register", (req, res) => res.render("register", { title: "Register", error: null, successUser: null }));
+app.get("/login", (req, res) =>
+  res.render("login", { title: "Login", error: null }),
+);
+app.get("/register", (req, res) =>
+  res.render("register", { title: "Register", error: null, successUser: null }),
+);
 app.get("/auth/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`[Application Framework]: Listening on port: ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`[Application Framework]: Listening on port: ${PORT}`),
+);
