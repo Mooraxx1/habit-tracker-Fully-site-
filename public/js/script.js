@@ -226,7 +226,6 @@ if (summaryDateInput && summaryOutputGrid && habitsContainerEl) {
   const localDay = String(todayObject.getDate()).padStart(2, "0");
 
   summaryDateInput.value = `${localYear}-${localMonth}-${localDay}`;
-
   summaryDateInput.addEventListener(
     "change",
     processAchievementSummaryFiltering,
@@ -238,7 +237,6 @@ function processAchievementSummaryFiltering() {
   if (!summaryDateInput || !summaryOutputGrid || !habitsContainerEl) return;
 
   summaryOutputGrid.innerHTML = "";
-
   const [year, month, day] = summaryDateInput.value.split("-");
   const selectedFilterDateString = new Date(
     year,
@@ -402,7 +400,6 @@ function renderTimelineTrackStructure() {
   const wMins = parseInt(localStorage.getItem("tm_workValue")) || 25;
   const bMins = parseInt(localStorage.getItem("tm_breakValue")) || 5;
   const totalRounds = parseInt(localStorage.getItem("tm_sessionsValue")) || 4;
-
   const totalSessionMinutes = wMins * totalRounds + bMins * totalRounds;
 
   for (let i = 0; i < totalRounds; i++) {
@@ -467,7 +464,6 @@ function updateGlobalUIs() {
     const wMins = parseInt(localStorage.getItem("tm_workValue")) || 25;
     const bMins = parseInt(localStorage.getItem("tm_breakValue")) || 5;
     const totalRounds = parseInt(localStorage.getItem("tm_sessionsValue")) || 4;
-
     const totalSessionSeconds =
       (wMins * totalRounds + bMins * totalRounds) * 60;
 
@@ -509,11 +505,9 @@ function updateGlobalUIs() {
 
 function evaluateOverlayVisibility() {
   if (!miniTimerOverlay) return;
-
   const isAuthPage =
     window.location.pathname === "/login" ||
     window.location.pathname === "/register";
-
   if (isTimerPage || isAuthPage) {
     miniTimerOverlay.classList.add("hidden-overlay");
   } else {
@@ -684,7 +678,6 @@ function executeSessionCompletion() {
 
   localStorage.setItem("tm_totalDuration", totalDuration.toString());
   localStorage.setItem("tm_timeLeft", timeLeft.toString());
-
   updateGlobalUIs();
 }
 
@@ -712,6 +705,7 @@ function closeResetModal() {
   if (customResetModal) customResetModal.style.display = "none";
 }
 
+// Fixed declaration reference syntax issue
 function resetTimerTrigger(bypassConfirm = false) {
   if (bypassConfirm !== true) {
     openResetModal();
@@ -745,7 +739,6 @@ function resetTimerTrigger(bypassConfirm = false) {
 
 if (startBtn) startBtn.addEventListener("click", toggleTimerTrigger);
 if (miniStartBtn) miniStartBtn.addEventListener("click", toggleTimerTrigger);
-
 if (resetBtn)
   resetBtn.addEventListener("click", () => resetTimerTrigger(false));
 if (miniResetBtn)
@@ -889,7 +882,6 @@ function playAlarmSound() {
 
     oscillator.type = "sine";
     oscillator.frequency.value = 880;
-
     gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(
       0.001,
@@ -898,7 +890,6 @@ function playAlarmSound() {
 
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-
     oscillator.start();
     oscillator.stop(audioCtx.currentTime + 1.5);
   } catch (e) {
@@ -931,5 +922,25 @@ window.addEventListener("click", function (event) {
     ) {
       menu.style.display = "none";
     }
+  }
+});
+
+// ==========================================================================
+// 7. SECURE AUTHENTICATION PASSWORD VISIBILITY TOGGLE HIERARCHY
+// ==========================================================================
+const passwordToggleMappings = [
+  { triggerId: "togglePassword", inputId: "loginPassword" },
+  { triggerId: "toggleRegPassword", inputId: "regPassword" },
+];
+
+passwordToggleMappings.forEach(({ triggerId, inputId }) => {
+  const triggerElement = document.getElementById(triggerId);
+  const inputElement = document.getElementById(inputId);
+
+  if (triggerElement && inputElement) {
+    triggerElement.addEventListener("click", () => {
+      const isPasswordType = inputElement.getAttribute("type") === "password";
+      inputElement.setAttribute("type", isPasswordType ? "text" : "password");
+    });
   }
 });

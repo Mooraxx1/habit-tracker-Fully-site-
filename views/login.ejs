@@ -4,37 +4,41 @@
     
     <h1 style="text-align: center; margin-bottom: 2.5rem; color: var(--text-main); font-weight: 800; letter-spacing: -0.5px;">Account Sign In</h1>
     
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 12px; border-radius: 6px; margin-bottom: 1.5rem; text-align: center; font-weight: 600;">
+            <%= error %>
+        </div>
+    <% } %>
+
     <form action="/auth/login" method="POST">
         <div class="form-group">
             <label for="loginUsername" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">Username</label>
             <input type="text" id="loginUsername" name="username" placeholder="Enter your username" style="margin-top: 8px;" required>
         </div>
         
-        <div class="form-group" style="margin-top: 1.5rem;">
+        <div class="form-group" style="margin-top: 1.5rem; position: relative;">
             <label for="loginPassword" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">Password</label>
-            <input type="password" id="loginPassword" name="password" placeholder="Enter secure password credentials" style="margin-top: 8px;" required>
+            <input type="password" id="loginPassword" name="password" placeholder="Enter secure password" style="margin-top: 8px; padding-right: 40px;" required>
+            <span id="togglePassword" style="position: absolute; right: 12px; top: 42px; cursor: pointer;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </span>
         </div>
         
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 14px; font-size: 1rem; font-weight: 700; letter-spacing: 0.5px; border-radius: 6px;">Sign In</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 14px; font-weight: 700; border-radius: 6px;">Sign In</button>
     </form>
     
     <p style="text-align: center; margin-top: 2rem; font-size: 0.95rem; color: var(--text-muted);">
-        Don't have an account registry? <a href="/register" style="color: var(--primary); text-decoration: none; font-weight: 800; border-bottom: 2px solid var(--primary); padding-bottom: 2px; margin-left: 4px;">Register here</a>
+        Don't have an account? <a href="/register" style="color: var(--primary); font-weight: 800; border-bottom: 2px solid var(--primary);">Register here</a>
     </p>
 </div>
 
-<% if (typeof errorMsg !== 'undefined' && errorMsg !== null) { %>
-    <div id="loginErrorModal" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center;">
-        <div class="card" style="max-width: 440px; width: 90%; text-align: center; padding: 2.5rem; border-radius: 14px; border: 1px solid var(--border); background-color: var(--card-bg); box-shadow: var(--shadow);">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
-            <h3 style="margin-bottom: 0.75rem; color: var(--text-main); font-weight: 800; font-size: 1.4rem;">Authentication Failed</h3>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.55;"><%= errorMsg %></p>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <button onclick="document.getElementById('loginErrorModal').style.display='none'" class="btn" style="width: 100%; padding: 12px; font-weight: 700; background-color: var(--border); color: var(--text-main); border-radius: 6px;">Try Logging In Again</button>
-                <a href="/register" class="btn btn-primary" style="text-decoration: none; text-align: center; padding: 12px; font-weight: 800; font-size: 1rem; border-radius: 6px; background-color: var(--primary);">Go to Register Account</a>
-            </div>
-        </div>
-    </div>
-<% } %>
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#loginPassword');
+    togglePassword.addEventListener('click', () => {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+    });
+</script>
 
 <%- include('partials/footer') %>
