@@ -1,14 +1,16 @@
 // ==========================================================================
-// 1. MODULE INITIALIZATION & CONFIGURATION
+// 1. MODULE INITIALIZATION & CONFIGURATION WITH TRACE LOGGING
 // ==========================================================================
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const MongoStore = require("connect-mongo");
+const MongoStore = require("connect-mongo"); // Clean v5 import
 const bcrypt = require("bcryptjs");
 const User = require("./models/User");
+
+console.log("[System Core]: Modules required successfully.");
 
 const app = express();
 
@@ -19,49 +21,87 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+console.log("[System Core]: View engine and basic body parsers mounted.");
+
 // ==========================================================================
 // 2. CLOUD DATABASE CONNECTION
 // ==========================================================================
 const MONGO_URI = process.env.MONGODB_URI;
+console.log(
+  "[Database Engine]: MONGODB_URI presence check ->",
+  MONGO_URI ? "FOUND" : "MISSING",
+);
 
 mongoose
   .connect(MONGO_URI)
-  .then(() => console.log("[Database Connected]: MongoDB Atlas Cloud Active."))
-  .catch((err) => console.error("Database connection error:", err));
+  .then(() =>
+    console.log(
+      "[Database Engine]: SUCCESS - Connected to MongoDB Atlas Cloud.",
+    ),
+  )
+  .catch((err) =>
+    console.error(
+      "[Database Engine]: CRITICAL ERROR - Connection failed ->",
+      err,
+    ),
+  );
 
 // ==========================================================================
-// 3. PERSISTENT SESSION MIDDLEWARE (UNIVERSAL VERSION FALLBACK WORKING)
+// 3. PERSISTENT SESSION MIDDLEWARE (STRICT CONNECT-MONGO V5 SYNTAX)
 // ==========================================================================
+console.log(
+  "[Session Engine]: Constructing MongoStore session configuration...",
+);
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "devmoor_secret_key",
     resave: false,
     saveUninitialized: false,
-    store:
-      typeof MongoStore.create === "function"
-        ? MongoStore.create({ mongoUrl: MONGO_URI, collectionName: "sessions" })
-        : new MongoStore({ url: MONGO_URI, collectionName: "sessions" }),
+    store: MongoStore.create({
+      mongoUrl: MONGO_URI,
+      collectionName: "sessions",
+      ttl: 14 * 24 * 60 * 60, // Sessions drop after 14 days
+    }),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // Keep users logged in for 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 7, // Cookies remain active for 7 days
     },
   }),
 );
 
+console.log(
+  "[Session Engine]: Middleware attached to express execution lifecycle.",
+);
+
 function isAuthenticated(req, res, next) {
+  console.log(
+    "[Route Guard]: Verifying session ID ->",
+    req.session.userId || "No session active",
+  );
   if (req.session.userId) return next();
   res.redirect("/login");
 }
 
 // ==========================================================================
-// 4. AUTHENTICATION ROUTES (CASE-INSENSITIVE & DYNAMIC ERRORS)
+// 4. AUTHENTICATION ROUTES (CASE-INSENSITIVE CORRECTION & ARTIFACT HUNTING)
 // ==========================================================================
 app.post("/auth/register", async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log(
+      "[Auth - Register]: Incoming registration request for raw user:",
+      username,
+    );
+
     const cleanUsername = username.trim().toLowerCase();
+    console.log(
+      "[Auth - Register]: Normalized target input name:",
+      cleanUsername,
+    );
 
     const existingUser = await User.findOne({ username: cleanUsername });
     if (existingUser) {
+      console.log("[Auth - Register]: HALT - Username collision detected.");
       return res.render("register", {
         error: "Username is already taken. Please choose another.",
       });
@@ -76,8 +116,12 @@ app.post("/auth/register", async (req, res) => {
     });
     await newUser.save();
 
+    console.log(
+      "[Auth - Register]: SUCCESS - Saved new document to MongoDB Atlas.",
+    );
     res.redirect("/login");
   } catch (err) {
+    console.error("[Auth - Register]: Execution failure stack:", err.message);
     res.render("register", {
       error: "System error during registration: " + err.message,
     });
@@ -87,11 +131,22 @@ app.post("/auth/register", async (req, res) => {
 app.post("/auth/login", async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log(
+      "[Auth - Login]: Incoming login verification request for raw user:",
+      username,
+    );
+
     const cleanUsername = username.trim().toLowerCase();
+    console.log(
+      "[Auth - Login]: Normalized login comparison target:",
+      cleanUsername,
+    );
 
     const user = await User.findOne({ username: cleanUsername });
-
     if (!user) {
+      console.log(
+        "[Auth - Login]: FAIL - Username not located in Atlas collections mapping.",
+      );
       return res.render("login", {
         error: "User not found. Please check your username.",
       });
@@ -99,14 +154,22 @@ app.post("/auth/login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log(
+        "[Auth - Login]: FAIL - Cleartext password hash match validation mismatch.",
+      );
       return res.render("login", {
         error: "Incorrect password. Please try again.",
       });
     }
 
     req.session.userId = user._id.toString();
+    console.log(
+      "[Auth - Login]: SUCCESS - Session instance provisioned with tracking ID:",
+      req.session.userId,
+    );
     res.redirect("/");
   } catch (err) {
+    console.error("[Auth - Login]: Execution failure stack:", err.message);
     res.render("login", { error: "System error during login: " + err.message });
   }
 });
@@ -116,14 +179,24 @@ app.post("/auth/login", async (req, res) => {
 // ==========================================================================
 app.get("/", isAuthenticated, async (req, res) => {
   try {
+    console.log("[Dashboard Router]: Serving index workspace layout.");
     const user = await User.findById(req.session.userId);
-    if (!user) return res.redirect("/auth/logout");
+    if (!user) {
+      console.log(
+        "[Dashboard Router]: Session bound to orphan reference object. Clearing session payload.",
+      );
+      return res.redirect("/auth/logout");
+    }
     res.render("index", {
       title: "Dashboard",
       habits: user.habits,
       posts: user.posts,
     });
   } catch (err) {
+    console.error(
+      "[Dashboard Router]: Read execution vector crashed:",
+      err.message,
+    );
     res.redirect("/login");
   }
 });
@@ -193,8 +266,13 @@ app.get("/register", (req, res) =>
   res.render("register", { title: "Register", error: null }),
 );
 app.get("/auth/logout", (req, res) => {
+  console.log("[Logout Router]: Invalidating active session token handles.");
   req.session.destroy(() => res.redirect("/login"));
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(
+    `[Application Framework]: Execution listening initialized on target port: ${PORT}`,
+  ),
+);
