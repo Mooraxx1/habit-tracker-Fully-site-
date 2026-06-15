@@ -6,7 +6,6 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const MongoStore = require("connect-mongo"); // Clean v5 import
 const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 
@@ -32,6 +31,13 @@ console.log(
   MONGO_URI ? "FOUND" : "MISSING",
 );
 
+if (!MONGO_URI) {
+  console.error(
+    "[Database Engine]: CRITICAL - MONGODB_URI is not set. Halting.",
+  );
+  process.exit(1);
+}
+
 mongoose
   .connect(MONGO_URI)
   .then(() =>
@@ -47,24 +53,61 @@ mongoose
   );
 
 // ==========================================================================
-// 3. PERSISTENT SESSION MIDDLEWARE (STRICT CONNECT-MONGO V5 SYNTAX)
+// 3. PERSISTENT SESSION MIDDLEWARE (AUTO-DETECTING CONNECT-MONGO VERSION)
 // ==========================================================================
 console.log(
   "[Session Engine]: Constructing MongoStore session configuration...",
 );
+
+let sessionStore;
+
+try {
+  const ConnectMongo = require("connect-mongo");
+
+  // connect-mongo v4+ uses ConnectMongo.create()
+  if (typeof ConnectMongo.create === "function") {
+    console.log(
+      "[Session Engine]: Detected connect-mongo v4+ → using .create()",
+    );
+    sessionStore = ConnectMongo.create({
+      mongoUrl: MONGO_URI,
+      collectionName: "sessions",
+      ttl: 14 * 24 * 60 * 60,
+    });
+
+    // connect-mongo v3 is a factory function called directly
+  } else if (typeof ConnectMongo === "function") {
+    console.log(
+      "[Session Engine]: Detected connect-mongo v3 → using factory pattern",
+    );
+    const MongoStoreV3 = ConnectMongo(session);
+    sessionStore = new MongoStoreV3({
+      url: MONGO_URI,
+      collection: "sessions",
+      ttl: 14 * 24 * 60 * 60,
+    });
+  } else {
+    throw new Error("Unrecognized connect-mongo export shape.");
+  }
+} catch (err) {
+  console.error(
+    "[Session Engine]: CRITICAL - Could not initialize MongoStore:",
+    err.message,
+  );
+  console.warn(
+    "[Session Engine]: Falling back to in-memory MemoryStore (sessions will not persist across restarts).",
+  );
+  sessionStore = undefined; // express-session will use MemoryStore by default
+}
 
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "devmoor_secret_key",
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: MONGO_URI,
-      collectionName: "sessions",
-      ttl: 14 * 24 * 60 * 60, // Sessions drop after 14 days
-    }),
+    ...(sessionStore ? { store: sessionStore } : {}),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // Cookies remain active for 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     },
   }),
 );
@@ -73,6 +116,9 @@ console.log(
   "[Session Engine]: Middleware attached to express execution lifecycle.",
 );
 
+// ==========================================================================
+// 4. ROUTE GUARD
+// ==========================================================================
 function isAuthenticated(req, res, next) {
   console.log(
     "[Route Guard]: Verifying session ID ->",
@@ -83,7 +129,7 @@ function isAuthenticated(req, res, next) {
 }
 
 // ==========================================================================
-// 4. AUTHENTICATION ROUTES (CASE-INSENSITIVE CORRECTION & ARTIFACT HUNTING)
+// 5. AUTHENTICATION ROUTES
 // ==========================================================================
 app.post("/auth/register", async (req, res) => {
   try {
@@ -92,6 +138,12 @@ app.post("/auth/register", async (req, res) => {
       "[Auth - Register]: Incoming registration request for raw user:",
       username,
     );
+
+    if (!username || !password) {
+      return res.render("register", {
+        error: "Username and password are required.",
+      });
+    }
 
     const cleanUsername = username.trim().toLowerCase();
     console.log(
@@ -136,6 +188,12 @@ app.post("/auth/login", async (req, res) => {
       username,
     );
 
+    if (!username || !password) {
+      return res.render("login", {
+        error: "Username and password are required.",
+      });
+    }
+
     const cleanUsername = username.trim().toLowerCase();
     console.log(
       "[Auth - Login]: Normalized login comparison target:",
@@ -145,7 +203,7 @@ app.post("/auth/login", async (req, res) => {
     const user = await User.findOne({ username: cleanUsername });
     if (!user) {
       console.log(
-        "[Auth - Login]: FAIL - Username not located in Atlas collections mapping.",
+        "[Auth - Login]: FAIL - Username not located in Atlas collections.",
       );
       return res.render("login", {
         error: "User not found. Please check your username.",
@@ -154,9 +212,7 @@ app.post("/auth/login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log(
-        "[Auth - Login]: FAIL - Cleartext password hash match validation mismatch.",
-      );
+      console.log("[Auth - Login]: FAIL - Password hash mismatch.");
       return res.render("login", {
         error: "Incorrect password. Please try again.",
       });
@@ -164,7 +220,7 @@ app.post("/auth/login", async (req, res) => {
 
     req.session.userId = user._id.toString();
     console.log(
-      "[Auth - Login]: SUCCESS - Session instance provisioned with tracking ID:",
+      "[Auth - Login]: SUCCESS - Session provisioned with tracking ID:",
       req.session.userId,
     );
     res.redirect("/");
@@ -175,7 +231,7 @@ app.post("/auth/login", async (req, res) => {
 });
 
 // ==========================================================================
-// 5. APPLICATION LOGIC & API ENDPOINTS
+// 6. APPLICATION ROUTES & API ENDPOINTS
 // ==========================================================================
 app.get("/", isAuthenticated, async (req, res) => {
   try {
@@ -183,7 +239,7 @@ app.get("/", isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
     if (!user) {
       console.log(
-        "[Dashboard Router]: Session bound to orphan reference object. Clearing session payload.",
+        "[Dashboard Router]: Session bound to orphan reference. Clearing.",
       );
       return res.redirect("/auth/logout");
     }
@@ -193,10 +249,7 @@ app.get("/", isAuthenticated, async (req, res) => {
       posts: user.posts,
     });
   } catch (err) {
-    console.error(
-      "[Dashboard Router]: Read execution vector crashed:",
-      err.message,
-    );
+    console.error("[Dashboard Router]: Read execution crashed:", err.message);
     res.redirect("/login");
   }
 });
@@ -204,8 +257,10 @@ app.get("/", isAuthenticated, async (req, res) => {
 app.get("/manage", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
+    if (!user) return res.redirect("/auth/logout");
     res.render("manage", { title: "Manage Habits", habits: user.habits });
   } catch (err) {
+    console.error("[Manage Router]: Error:", err.message);
     res.redirect("/");
   }
 });
@@ -214,6 +269,7 @@ app.post("/api/habits", isAuthenticated, async (req, res) => {
   try {
     const { name, requiredTimeFormat, schedule, urls } = req.body;
     const user = await User.findById(req.session.userId);
+    if (!user) return res.status(401).send("Unauthorized.");
 
     let hours = 1;
     if (requiredTimeFormat && requiredTimeFormat.includes(":")) {
@@ -232,6 +288,7 @@ app.post("/api/habits", isAuthenticated, async (req, res) => {
     await user.save();
     res.redirect("/manage?created=success");
   } catch (err) {
+    console.error("[Habits API]: Save error:", err.message);
     res.status(500).send("Save error.");
   }
 });
@@ -240,6 +297,9 @@ app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
   try {
     const { habitId, minutesWorked } = req.body;
     const user = await User.findById(req.session.userId);
+    if (!user)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+
     const habit = user.habits.find((h) => h.id === habitId);
     if (habit) {
       habit.completedTime = Math.min(
@@ -252,12 +312,13 @@ app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
       res.status(404).json({ success: false, message: "Habit not found" });
     }
   } catch (err) {
+    console.error("[Progress API]: Error:", err.message);
     res.status(500).json({ success: false });
   }
 });
 
 // ==========================================================================
-// 6. UTILITY ROUTES
+// 7. UTILITY ROUTES
 // ==========================================================================
 app.get("/login", (req, res) =>
   res.render("login", { title: "Login", error: null }),
@@ -266,13 +327,14 @@ app.get("/register", (req, res) =>
   res.render("register", { title: "Register", error: null }),
 );
 app.get("/auth/logout", (req, res) => {
-  console.log("[Logout Router]: Invalidating active session token handles.");
+  console.log("[Logout Router]: Invalidating active session token.");
   req.session.destroy(() => res.redirect("/login"));
 });
 
+// ==========================================================================
+// 8. SERVER STARTUP
+// ==========================================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
-  console.log(
-    `[Application Framework]: Execution listening initialized on target port: ${PORT}`,
-  ),
+  console.log(`[Application Framework]: Listening on port: ${PORT}`),
 );
