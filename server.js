@@ -265,6 +265,30 @@ app.get("/manage", isAuthenticated, async (req, res) => {
   }
 });
 
+// FIXED: Added missing Timer view route
+app.get("/timer", isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.redirect("/auth/logout");
+    res.render("timer", { title: "Focus Timer", habits: user.habits });
+  } catch (err) {
+    console.error("[Timer Router]: Error:", err.message);
+    res.redirect("/");
+  }
+});
+
+// FIXED: Added missing Diary view route
+app.get("/diary", isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.redirect("/auth/logout");
+    res.render("diary", { title: "My Diary Wall", posts: user.posts });
+  } catch (err) {
+    console.error("[Diary Router]: Error:", err.message);
+    res.redirect("/");
+  }
+});
+
 app.post("/api/habits", isAuthenticated, async (req, res) => {
   try {
     const { name, requiredTimeFormat, schedule, urls } = req.body;
