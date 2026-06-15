@@ -129,20 +129,13 @@ function isAuthenticated(req, res, next) {
 app.post("/auth/register", async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(
-      "[Auth - Register]: Incoming registration request for raw user:",
-      username,
-    );
-
     if (!username || !password) {
       return res.render("register", {
         error: "Username and password are required.",
         successUser: null,
       });
     }
-
     const cleanUsername = username.trim().toLowerCase();
-
     const existingUser = await User.findOne({ username: cleanUsername });
     if (existingUser) {
       return res.render("register", {
@@ -150,7 +143,6 @@ app.post("/auth/register", async (req, res) => {
         successUser: null,
       });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       username: cleanUsername,
@@ -159,13 +151,8 @@ app.post("/auth/register", async (req, res) => {
       posts: [],
     });
     await newUser.save();
-
-    console.log(
-      "[Auth - Register]: SUCCESS - Rendering custom success card container.",
-    );
     res.render("register", { error: null, successUser: cleanUsername });
   } catch (err) {
-    console.error("[Auth - Register]: Execution failure stack:", err.message);
     res.render("register", {
       error: "System error during registration: " + err.message,
       successUser: null,
@@ -176,37 +163,24 @@ app.post("/auth/register", async (req, res) => {
 app.post("/auth/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(
-      "[Auth - Login]: Incoming login verification request for raw user:",
-      username,
-    );
-
-    if (!username || !password) {
+    if (!username || !password)
       return res.render("login", {
         error: "Username and password are required.",
       });
-    }
-
     const cleanUsername = username.trim().toLowerCase();
-
     const user = await User.findOne({ username: cleanUsername });
-    if (!user) {
+    if (!user)
       return res.render("login", {
         error: "User not found. Please check your username.",
       });
-    }
-
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    if (!isMatch)
       return res.render("login", {
         error: "Incorrect password. Please try again.",
       });
-    }
-
     req.session.userId = user._id.toString();
     res.redirect("/");
   } catch (err) {
-    console.error("[Auth - Login]: Execution failure stack:", err.message);
     res.render("login", { error: "System error during login: " + err.message });
   }
 });
@@ -283,12 +257,10 @@ app.post("/api/profile/update", isAuthenticated, async (req, res) => {
     const { displayName, bio, avatarUrl } = req.body;
     const user = await User.findById(req.session.userId);
     if (!user) return res.status(401).send("Unauthorized.");
-
     user.displayName = displayName;
     user.bio = bio;
     user.avatarUrl = avatarUrl;
     await user.save();
-
     res.redirect("/profile/details");
   } catch (err) {
     res.status(500).send("Error saving profile details.");
@@ -300,13 +272,11 @@ app.post("/api/habits", isAuthenticated, async (req, res) => {
     const { name, requiredTimeFormat, schedule, urls } = req.body;
     const user = await User.findById(req.session.userId);
     if (!user) return res.status(401).send("Unauthorized.");
-
     let hours = 1;
     if (requiredTimeFormat && requiredTimeFormat.includes(":")) {
       const [h, m] = requiredTimeFormat.split(":");
       hours = parseFloat(h) + parseFloat(m) / 60;
     }
-
     user.habits.push({
       id: Date.now().toString(),
       name: name.trim(),
@@ -322,13 +292,27 @@ app.post("/api/habits", isAuthenticated, async (req, res) => {
   }
 });
 
+// FIXED: Added seamless dynamic deletion endpoint handler matching frontend request mapping
+app.delete("/api/habits/:id", isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    user.habits = user.habits.filter((habit) => habit.id !== req.params.id);
+    await user.save();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
   try {
     const { habitId, minutesWorked } = req.body;
     const user = await User.findById(req.session.userId);
     if (!user)
       return res.status(401).json({ success: false, message: "Unauthorized" });
-
     const habit = user.habits.find((h) => h.id === habitId);
     if (habit) {
       habit.completedTime = Math.min(
@@ -358,9 +342,6 @@ app.get("/auth/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
 });
 
-// ==========================================================================
-// 8. SERVER STARTUP
-// ==========================================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   console.log(`[Application Framework]: Listening on port: ${PORT}`),
