@@ -36,8 +36,10 @@
     padding: 0;
 }
 
-html, body {
-    height: 100%;
+html {
+    /* Allows natural overflow expansion based on content height */
+    height: auto;
+    min-height: 100%;
 }
 
 body {
@@ -48,7 +50,12 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    /* Enforces layout height to stretch flexibly instead of clamping down */
+    height: auto; 
     padding-bottom: 140px !important; 
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
 }
 
 .site-wrapper {
