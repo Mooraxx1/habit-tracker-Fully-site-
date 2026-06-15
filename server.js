@@ -64,7 +64,6 @@ let sessionStore;
 try {
   const ConnectMongo = require("connect-mongo");
 
-  // connect-mongo v4+ uses ConnectMongo.create()
   if (typeof ConnectMongo.create === "function") {
     console.log(
       "[Session Engine]: Detected connect-mongo v4+ → using .create()",
@@ -74,8 +73,6 @@ try {
       collectionName: "sessions",
       ttl: 14 * 24 * 60 * 60,
     });
-
-    // connect-mongo v3 is a factory function called directly
   } else if (typeof ConnectMongo === "function") {
     console.log(
       "[Session Engine]: Detected connect-mongo v3 → using factory pattern",
@@ -94,10 +91,8 @@ try {
     "[Session Engine]: CRITICAL - Could not initialize MongoStore:",
     err.message,
   );
-  console.warn(
-    "[Session Engine]: Falling back to in-memory MemoryStore (sessions will not persist across restarts).",
-  );
-  sessionStore = undefined; // express-session will use MemoryStore by default
+  console.warn("[Session Engine]: Falling back to in-memory MemoryStore.");
+  sessionStore = undefined;
 }
 
 app.use(
@@ -107,7 +102,7 @@ app.use(
     saveUninitialized: false,
     ...(sessionStore ? { store: sessionStore } : {}),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 7,
     },
   }),
 );
@@ -235,21 +230,14 @@ app.post("/auth/login", async (req, res) => {
 // ==========================================================================
 app.get("/", isAuthenticated, async (req, res) => {
   try {
-    console.log("[Dashboard Router]: Serving index workspace layout.");
     const user = await User.findById(req.session.userId);
-    if (!user) {
-      console.log(
-        "[Dashboard Router]: Session bound to orphan reference. Clearing.",
-      );
-      return res.redirect("/auth/logout");
-    }
+    if (!user) return res.redirect("/auth/logout");
     res.render("index", {
       title: "Dashboard",
       habits: user.habits,
       posts: user.posts,
     });
   } catch (err) {
-    console.error("[Dashboard Router]: Read execution crashed:", err.message);
     res.redirect("/login");
   }
 });
@@ -260,7 +248,6 @@ app.get("/manage", isAuthenticated, async (req, res) => {
     if (!user) return res.redirect("/auth/logout");
     res.render("manage", { title: "Manage Habits", habits: user.habits });
   } catch (err) {
-    console.error("[Manage Router]: Error:", err.message);
     res.redirect("/");
   }
 });
@@ -271,7 +258,6 @@ app.get("/timer", isAuthenticated, async (req, res) => {
     if (!user) return res.redirect("/auth/logout");
     res.render("timer", { title: "Focus Timer", habits: user.habits });
   } catch (err) {
-    console.error("[Timer Router]: Error:", err.message);
     res.redirect("/");
   }
 });
@@ -282,20 +268,53 @@ app.get("/diary", isAuthenticated, async (req, res) => {
     if (!user) return res.redirect("/auth/logout");
     res.render("diary", { title: "My Diary Wall", posts: user.posts });
   } catch (err) {
-    console.error("[Diary Router]: Error:", err.message);
     res.redirect("/");
   }
 });
 
-// FIXED: Added missing Profile Settings view route
+// FIXED: Added Profile Details Route
+app.get("/profile/details", isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.redirect("/auth/logout");
+    res.render("profile-details", { title: "Profile Details", user: user });
+  } catch (err) {
+    console.error("[Profile Details Router]: Error:", err.message);
+    res.redirect("/");
+  }
+});
+
+// FIXED: Added Profile Settings Route
 app.get("/profile/settings", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
     if (!user) return res.redirect("/auth/logout");
-    res.render("settings", { title: "Account Settings", user: user });
+    res.render("profile-setting", { title: "Account Settings", user: user });
   } catch (err) {
     console.error("[Settings Router]: Error:", err.message);
     res.redirect("/");
+  }
+});
+
+// FIXED: Added Profile Update Data API
+app.post("/api/profile/update", isAuthenticated, async (req, res) => {
+  try {
+    const { displayName, bio, avatarUrl } = req.body;
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.status(401).send("Unauthorized.");
+
+    // Update the user document
+    user.displayName = displayName;
+    user.bio = bio;
+    user.avatarUrl = avatarUrl;
+
+    await user.save();
+
+    // Redirect back to profile details so they can see the changes
+    res.redirect("/profile/details");
+  } catch (err) {
+    console.error("[Profile Update API]: Save error:", err.message);
+    res.status(500).send("Error saving profile details.");
   }
 });
 
