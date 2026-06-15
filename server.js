@@ -137,20 +137,17 @@ app.post("/auth/register", async (req, res) => {
     if (!username || !password) {
       return res.render("register", {
         error: "Username and password are required.",
+        successUser: null,
       });
     }
 
     const cleanUsername = username.trim().toLowerCase();
-    console.log(
-      "[Auth - Register]: Normalized target input name:",
-      cleanUsername,
-    );
 
     const existingUser = await User.findOne({ username: cleanUsername });
     if (existingUser) {
-      console.log("[Auth - Register]: HALT - Username collision detected.");
       return res.render("register", {
         error: "Username is already taken. Please choose another.",
+        successUser: null,
       });
     }
 
@@ -164,13 +161,14 @@ app.post("/auth/register", async (req, res) => {
     await newUser.save();
 
     console.log(
-      "[Auth - Register]: SUCCESS - Saved new document to MongoDB Atlas.",
+      "[Auth - Register]: SUCCESS - Rendering custom success card container.",
     );
-    res.redirect("/login");
+    res.render("register", { error: null, successUser: cleanUsername });
   } catch (err) {
     console.error("[Auth - Register]: Execution failure stack:", err.message);
     res.render("register", {
       error: "System error during registration: " + err.message,
+      successUser: null,
     });
   }
 });
@@ -190,16 +188,9 @@ app.post("/auth/login", async (req, res) => {
     }
 
     const cleanUsername = username.trim().toLowerCase();
-    console.log(
-      "[Auth - Login]: Normalized login comparison target:",
-      cleanUsername,
-    );
 
     const user = await User.findOne({ username: cleanUsername });
     if (!user) {
-      console.log(
-        "[Auth - Login]: FAIL - Username not located in Atlas collections.",
-      );
       return res.render("login", {
         error: "User not found. Please check your username.",
       });
@@ -207,17 +198,12 @@ app.post("/auth/login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("[Auth - Login]: FAIL - Password hash mismatch.");
       return res.render("login", {
         error: "Incorrect password. Please try again.",
       });
     }
 
     req.session.userId = user._id.toString();
-    console.log(
-      "[Auth - Login]: SUCCESS - Session provisioned with tracking ID:",
-      req.session.userId,
-    );
     res.redirect("/");
   } catch (err) {
     console.error("[Auth - Login]: Execution failure stack:", err.message);
@@ -272,48 +258,39 @@ app.get("/diary", isAuthenticated, async (req, res) => {
   }
 });
 
-// FIXED: Added Profile Details Route
 app.get("/profile/details", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
     if (!user) return res.redirect("/auth/logout");
     res.render("profile-details", { title: "Profile Details", user: user });
   } catch (err) {
-    console.error("[Profile Details Router]: Error:", err.message);
     res.redirect("/");
   }
 });
 
-// FIXED: Added Profile Settings Route
 app.get("/profile/settings", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
     if (!user) return res.redirect("/auth/logout");
     res.render("profile-setting", { title: "Account Settings", user: user });
   } catch (err) {
-    console.error("[Settings Router]: Error:", err.message);
     res.redirect("/");
   }
 });
 
-// FIXED: Added Profile Update Data API
 app.post("/api/profile/update", isAuthenticated, async (req, res) => {
   try {
     const { displayName, bio, avatarUrl } = req.body;
     const user = await User.findById(req.session.userId);
     if (!user) return res.status(401).send("Unauthorized.");
 
-    // Update the user document
     user.displayName = displayName;
     user.bio = bio;
     user.avatarUrl = avatarUrl;
-
     await user.save();
 
-    // Redirect back to profile details so they can see the changes
     res.redirect("/profile/details");
   } catch (err) {
-    console.error("[Profile Update API]: Save error:", err.message);
     res.status(500).send("Error saving profile details.");
   }
 });
@@ -341,7 +318,6 @@ app.post("/api/habits", isAuthenticated, async (req, res) => {
     await user.save();
     res.redirect("/manage?created=success");
   } catch (err) {
-    console.error("[Habits API]: Save error:", err.message);
     res.status(500).send("Save error.");
   }
 });
@@ -365,7 +341,6 @@ app.post("/api/habits/progress", isAuthenticated, async (req, res) => {
       res.status(404).json({ success: false, message: "Habit not found" });
     }
   } catch (err) {
-    console.error("[Progress API]: Error:", err.message);
     res.status(500).json({ success: false });
   }
 });
@@ -377,10 +352,9 @@ app.get("/login", (req, res) =>
   res.render("login", { title: "Login", error: null }),
 );
 app.get("/register", (req, res) =>
-  res.render("register", { title: "Register", error: null }),
+  res.render("register", { title: "Register", error: null, successUser: null }),
 );
 app.get("/auth/logout", (req, res) => {
-  console.log("[Logout Router]: Invalidating active session token.");
   req.session.destroy(() => res.redirect("/login"));
 });
 
