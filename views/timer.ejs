@@ -1,17 +1,17 @@
 <%- include('partials/header') %>
 
 <div class="page-header" style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);" data-i18n="timer_title">Focus Timer</h1>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;" data-i18n="timer_title">Focus Timer</h1>
 </div>
 
-<div class="timer-layout" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>' style="align-items: stretch;">
+<div class="timer-layout" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>' style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
     
-    <div class="settings-sidebar" style="display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
+    <div class="settings-sidebar" style="display: flex; flex-direction: column; gap: 1.5rem; flex: 1; min-width: 300px;">
         
-        <div class="card" style="margin-bottom: 0; flex: 1; background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow);">
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <label for="habitSelect" style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;" data-i18n="select_habit_label">Target Habit</label>
-                <select id="habitSelect" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit;">
+        <div class="card" style="margin-bottom: 0; background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.75rem; border-radius: 12px; box-shadow: var(--shadow);">
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="habitSelect" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); display: block; margin-bottom: 0.5rem;" data-i18n="select_habit_label">Target Habit</label>
+                <select id="habitSelect" style="width: 100%; padding: 12px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem; cursor: pointer;">
                     <option value="" style="background-color: var(--card-bg); color: var(--text-main);" data-i18n="select_habit">Select a habit...</option>
                     <% if (typeof habits !== 'undefined' && habits && habits.length > 0) { %>
                         <% habits.forEach(habit => { %>
@@ -21,53 +21,57 @@
                 </select>
             </div>
             
-            <div class="form-group" style="margin-top: 1rem; margin-bottom: 1rem;">
-                <label for="workTime" style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;" data-i18n="work_label">Focus Session (Minutes)</label>
-                <input type="number" id="workTime" min="1" value="25" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit;">
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="workTime" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); display: block; margin-bottom: 0.5rem;" data-i18n="work_label">Focus Session (Minutes)</label>
+                <input type="number" id="workTime" min="1" value="25" style="width: 100%; padding: 12px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem;">
             </div>
             
-            <div class="form-group" style="margin-top: 1rem; margin-bottom: 1rem;">
-                <label for="breakTime" style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;" data-i18n="break_label">Break Session (Minutes)</label>
-                <input type="number" id="breakTime" min="1" value="5" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit;">
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="breakTime" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); display: block; margin-bottom: 0.5rem;" data-i18n="break_label">Break Session (Minutes)</label>
+                <input type="number" id="breakTime" min="1" value="3" style="width: 100%; padding: 12px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem;">
             </div>
             
-            <div class="form-group" style="margin-top: 1rem; margin-bottom: 0;">
-                <label for="sessions" style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;" data-i18n="sessions_label">Total Target Rounds</label>
-                <input type="number" id="sessions" min="1" value="4" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="sessions" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); display: block; margin-bottom: 0.5rem;" data-i18n="sessions_label">Total Target Rounds</label>
+                <input type="number" id="sessions" min="1" value="3" style="width: 100%; padding: 12px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem;">
             </div>
         </div>
 
-        <div class="card" id="habitGoalCalculatorPanelCard" style="border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; margin-bottom: 0; flex: 1; background: linear-gradient(145deg, var(--card-bg), var(--bg-color)); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow);">
-            <h4 style="color: var(--text-main); font-weight: 800; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.75rem; font-size: 1.1rem;">Goal Verification Plan</h4>
-            <div id="goalCalcTextOutputWrapper">
-                <p style="color: var(--text-muted); font-style: italic; font-size: 0.9rem; text-align: center; padding: 1rem 0;">Select an initialized habit above to activate live goal calculation maps.</p>
+        <div class="card" id="habitGoalCalculatorPanelCard" style="border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; margin-bottom: 0; background: var(--card-bg); padding: 1.75rem; border-radius: 12px; box-shadow: var(--shadow); transition: background-color 0.4s ease, border-color 0.4s ease;">
+            <h4 style="color: var(--text-main); font-weight: 800; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.75rem; font-size: 1.1rem; letter-spacing: -0.2px;" data-i18n="goal_planner_title">Goal Planner Assistance</h4>
+            <div id="goalCalcTextOutputWrapper" style="line-height: 1.5; font-size: 0.95rem; font-weight: 500;">
+                <p style="color: var(--text-muted); font-style: italic; text-align: center; padding: 1rem 0; margin: 0;" data-i18n="calc_select_habit_msg">Select an initialized habit above to activate live goal calculation maps.</p>
             </div>
         </div>
     </div>
 
-    <div class="card timer-display-pane" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg); border: 1px solid var(--border); padding: 2.5rem 1.5rem; border-radius: 12px; box-shadow: var(--shadow);">
-        <h2 id="sessionStatus" style="margin-top: 0; font-size: 1.4rem; font-weight: 600; letter-spacing: 0.5px; color: var(--text-main);" data-i18n="status_ready">Ready to Focus</h2>
+    <div class="card timer-display-pane" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 2; min-width: 340px; background-color: var(--card-bg); border: 1px solid var(--border); padding: 3rem 2rem; border-radius: 12px; box-shadow: var(--shadow);">
+        <h2 id="sessionStatus" style="margin-top: 0; font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; color: var(--text-main);" data-i18n="status_ready">Ready to Focus</h2>
         
-        <div class="circle-container" style="margin-top: 1rem; position: relative; width: 280px; height: 280px; margin-bottom: 2rem;">
+        <div class="circle-container" style="margin-top: 1.5rem; position: relative; width: 320px; height: 320px; margin-bottom: 2.5rem;">
             <svg class="timer-svg" style="width: 100%; height: 100%; transform: rotate(-90deg);">
-                <circle class="ring-bg" cx="140" cy="140" r="90" style="fill: transparent; stroke: var(--border); stroke-width: 8px;"></circle>
-                <circle id="progressRing" class="ring-progress stage-green" cx="140" cy="140" r="90" style="fill: transparent; stroke-width: 8px; stroke-dasharray: 565.48; stroke-dashoffset: 0; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s ease;"></circle>
+                <circle class="ring-bg" cx="160" cy="160" r="115" style="fill: transparent; stroke: var(--border); stroke-width: 10px;"></circle>
+                <circle id="progressRing" class="ring-progress stage-green" cx="160" cy="160" r="115" style="fill: transparent; stroke-width: 10px; stroke-dasharray: 722.56; stroke-dashoffset: 0; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.6s ease;"></circle>
             </svg>
-            <div class="clock-display" id="timeDisplay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3.5rem; font-family: monospace; font-weight: 700; color: var(--primary);">25:00</div>
+            <div class="clock-display" id="timeDisplay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4.25rem; font-family: monospace; font-weight: 800; color: var(--text-main); letter-spacing: -1px;">25:00</div>
         </div>
         
-        <div class="timer-controls" style="margin-top: 1rem; display: flex; justify-content: center; gap: 1rem; margin-bottom: 2.5rem;">
-            <button class="btn btn-primary" id="startBtn" style="padding: 12px 30px; font-size: 1.1rem; font-weight: 700; border-radius: 6px; cursor: pointer;" data-i18n="btn_start">Start</button>
-            <button class="btn" id="resetBtn" style="background-color: var(--border); color: var(--text-main); padding: 12px 30px; font-size: 1.1rem; font-weight: 700; border-radius: 6px; cursor: pointer; border: none;" data-i18n="btn_reset">Reset</button>
+        <div class="timer-controls" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 3rem; width: 100%; max-width: 400px;">
+            <div style="display: flex; gap: 1.25rem; width: 100%;">
+                <button type="button" class="btn btn-primary" id="startBtn" style="flex: 1; padding: 14px; font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: none; letter-spacing: 0.3px;" data-i18n="btn_start">Start</button>
+                <button type="button" class="btn" id="resetBtn" style="flex: 1; background-color: var(--border); color: var(--text-main); padding: 14px; font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: none; letter-spacing: 0.3px;" data-i18n="btn_reset">Reset</button>
+            </div>
+            <button type="button" class="btn" id="forceBreakTriggerBtn" style="width: 100%; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 12px; font-weight: 700; border-radius: 8px;" data-i18n="btn_force_break">Take Force Break</button>
+            <span id="extendHintLabel" style="display: none; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-align: center;" data-i18n="extend_hint_label">⚠️ Looking for rest? Click "Take Force Break" above anytime!</span>
         </div>
 
-        <div class="timeline-container" style="margin-top: 1.5rem; width: 100%; max-width: 550px; padding: 0 10px;">
-            <div class="timeline-meta" style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">
-                <span id="timelineCompletionPercent">Completion: 0%</span>
-                <span>Session Matrix Map</span>
+        <div class="timeline-container" style="width: 100%; max-width: 580px; padding: 0 5px;">
+            <div class="timeline-meta" style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 700; letter-spacing: 0.3px;">
+                <span id="timelineCompletionPercent" data-i18n="timeline_completion_initial">Completion: 0%</span>
+                <span style="text-transform: uppercase; font-size: 0.8rem; color: var(--primary);" data-i18n="session_matrix_map">Session Matrix Map</span>
             </div>
-            <div class="timeline-tracker-track" id="timelineTrack" style="position: relative; height: 24px; background-color: var(--border); border-radius: 6px; display: flex; overflow: visible; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
-                <div class="timeline-indicator-arrow" id="timelineIndicator" style="position: absolute; top: 0; left: 0%; width: 2px; height: 24px; background-color: #f59e0b; z-index: 10; transition: left 0.5s ease; box-shadow: 0 0 4px #f59e0b; transform: translateX(-50%);"></div>
+            <div class="timeline-tracker-track" id="localTimelineTrack" style="position: relative; height: 28px; background-color: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; display: flex; overflow: visible; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); padding: 2px;">
+                <div class="timeline-indicator-arrow" id="localTimelineIndicator" style="position: absolute; top: -4px; left: 0%; width: 4px; height: 34px; background-color: #f97316; z-index: 100; transition: left 1s linear; box-shadow: 0 0 8px #f97316; border-radius: 2px; transform: translateX(-50%);"></div>
             </div>
         </div>
     </div>
@@ -75,12 +79,30 @@
 
 <div id="customResetModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center;">
     <div class="card" style="max-width: 400px; width: 90%; text-align: center; padding: 2rem; border-radius: 12px; background-color: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow);">
-        <h3 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 700; font-size: 1.3rem;">Reset Focus Session?</h3>
-        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.75rem; line-height: 1.5;">Are you sure you want to stop this timer sequence loop? This will clear current session block logs.</p>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <button id="confirmResetBtn" class="btn btn-danger" style="flex: 1; padding: 12px; font-weight: 600; border-radius: 6px; cursor: pointer;">Yes, Reset</button>
-            <button id="cancelResetBtn" class="btn" style="flex: 1; background-color: var(--border); color: var(--text-main); padding: 12px; font-weight: 600; border-radius: 6px; cursor: pointer; border: none;">Cancel</button>
+        <h3 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800; font-size: 1.35rem; letter-spacing: -0.3px;" data-i18n="reset_modal_title">Reset Focus Session?</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;" data-i18n="reset_modal_desc">Are you sure you want to stop this timer sequence loop? This will clear current session block logs.</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="confirmResetBtn" class="btn btn-danger" style="flex: 1; padding: 12px; font-weight: 700; border-radius: 8px;" data-i18n="btn_yes_reset">Yes, Reset</button>
+            <button id="cancelResetBtn" class="btn" style="flex: 1; background-color: var(--border); color: var(--text-main); padding: 12px; font-weight: 700; border-radius: 8px;" data-i18n="btn_cancel">Cancel</button>
         </div>
+    </div>
+</div>
+
+<div id="forceBreakSelectionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px); z-index: 999999; justify-content: center; align-items: center;">
+    <div class="card" style="max-width: 420px; width: 90%; text-align: center; padding: 2rem; border-radius: 12px; background-color: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow);">
+        <h3 style="color: var(--text-main); font-weight: 800; font-size: 1.3rem; margin-bottom: 1rem;" data-i18n="force_break_title">Configure Break Duration</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;" data-i18n="force_break_desc">Select your desired off-cycle relaxation window parameter below:</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.75rem;">
+            <button type="button" class="btn break-opt-btn" data-mins="2" style="background: var(--bg-color); color: var(--text-main); padding: 10px 0; font-size: 0.9rem;">2 <span data-i18n="unit_min">Min</span></button>
+            <button type="button" class="btn break-opt-btn" data-mins="5" style="background: var(--bg-color); color: var(--text-main); padding: 10px 0; font-size: 0.9rem;">5 <span data-i18n="unit_min">Min</span></button>
+            <button type="button" class="btn break-opt-btn" data-mins="10" style="background: var(--bg-color); color: var(--text-main); padding: 10px 0; font-size: 0.9rem;">10 <span data-i18n="unit_min">Min</span></button>
+            <button type="button" class="btn break-opt-btn" data-mins="15" style="background: var(--bg-color); color: var(--text-main); padding: 10px 0; font-size: 0.9rem;">15 <span data-i18n="unit_min">Min</span></button>
+            <button type="button" class="btn break-opt-btn" data-mins="20" style="background: var(--bg-color); color: var(--text-main); padding: 10px 0; font-size: 0.9rem;">20 <span data-i18n="unit_min">Min</span></button>
+            <button type="button" class="btn break-opt-btn" data-mins="30" style="background: var(--bg-color); color: var(--text-main); padding: 10px 0; font-size: 0.9rem;">30 <span data-i18n="unit_min">Min</span></button>
+        </div>
+        
+        <button type="button" id="closeForceBreakConfigBtn" class="btn" style="width: 100%; background: var(--border); color: var(--text-main); padding: 11px;" data-i18n="btn_cancel">Cancel</button>
     </div>
 </div>
 

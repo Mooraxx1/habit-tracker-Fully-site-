@@ -1,678 +1,509 @@
 /* ==========================================================================
-   1. DESIGN TOKENS, CORE COLORS & THEMES
+   1. GLOBAL SYSTEM TOKENS & MASTER THEME VARIABLES
    ========================================================================== */
-:root {
-    --bg-color: #f4f7f6;
-    --nav-bg: #ffffff;
-    --card-bg: #ffffff;
-    --text-main: #2d3748;
-    --text-muted: #718096;
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --danger: #e53e3e;
-    --border: #e2e8f0;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    --invert-value: invert(0); /* Dynamic calendar fix hook */
-}
-
-[data-theme="dark"] {
+:root[data-theme="dark"] {
     --bg-color: #0f172a;
-    --nav-bg: #1e293b;
     --card-bg: #1e293b;
+    --border: #334155;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
-    --primary: #818cf8; 
-    --primary-hover: #a5b4fc;
-    --border: #334155;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-    --invert-value: invert(1); /* Forces dark icons on light fields and vice-versa */
+    --primary: #10b981;       /* Emerald Green */
+    --primary-hover: #059669;
+    --danger: #ef4444;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    
+    /* GitHub Grid Colors */
+    --grid-bg: #161b22;
+    --lvl-1: #0e4429;
+    --lvl-2: #006d32;
+    --lvl-3: #26a641;
+    --lvl-4: #39d353;
+}
+
+:root[data-theme="light"] {
+    --bg-color: #f8fafc;
+    --card-bg: #ffffff;
+    --border: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --primary: #6366f1;       /* Indigo Accent */
+    --primary-hover: #4f46e5;
+    --danger: #dc2626;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    
+    /* GitHub Grid Colors */
+    --grid-bg: #ebedf0;
+    --lvl-1: #9be9a8;
+    --lvl-2: #40c463;
+    --lvl-3: #30a14e;
+    --lvl-4: #216e39;
 }
 
 /* ==========================================================================
-   2. CORE LAYOUT STRUCTURE & STICKY CONFIGURATIONS
+   2. CORE ARCHITECTURE STRUCTURAL RESET
    ========================================================================== */
-*, *::before, *::after {
-    box-sizing: border-box;
+* {
     margin: 0;
     padding: 0;
-}
-
-html {
-    height: auto;
-    min-height: 100%;
+    box-sizing: border-box;
 }
 
 body {
     background-color: var(--bg-color);
     color: var(--text-main);
-    font-family: var(--font-family);
-    transition: background-color 0.3s, color 0.3s;
-    display: flex;
-    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     min-height: 100vh;
-    height: auto; 
-    padding-bottom: 140px !important; 
-    width: 100%;
-    max-width: var(--container-max);
-    margin: 0 auto;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .site-wrapper {
-    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .container {
-    max-width: 1000px;
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
-}
-
-/* RTL (Arabic) Font Override */
-[dir="rtl"] {
-    font-family: 'Tajawal', 'Segoe UI', sans-serif;
+    padding: 2rem 1.5rem;
 }
 
 /* ==========================================================================
-   3. NAVIGATION HEADER & CUSTOM PROFILE DROPDOWN
+   3. NAVIGATION BAR LAYOUT
    ========================================================================== */
 .navbar {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--nav-bg);
     padding: 1rem 2rem;
     box-shadow: var(--shadow);
-    border-bottom: 1px solid var(--border);
 }
 
-.logo a {
-    font-size: 1.6rem;
-    font-weight: 700;
+.navbar .logo a {
+    font-size: 1.5rem;
+    font-weight: 800;
     color: var(--primary);
     text-decoration: none;
     letter-spacing: -0.5px;
-    font-family: var(--font-family);
-    transition: color 0.3s ease;
-}
-
-.logo a:hover {
-    color: var(--primary-hover);
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-}
-
-.nav-links a {
-    color: var(--text-main);
-    text-decoration: none;
-    margin: 0 1rem;
-    font-weight: 500;
-}
-
-.nav-links a:hover {
-    color: var(--primary);
-}
-
-.profile-dropdown {
-    position: relative;
-    display: inline-block;
 }
 
 .btn-profile {
-    background: none;
-    border: none;
+    background: transparent;
+    border: 1px solid var(--border);
     color: var(--text-main);
+    padding: 8px 14px;
+    border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
-    padding: 5px 10px;
-    font-family: inherit;
-    font-size: 1rem;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    background-color: var(--card-bg);
-    min-width: 180px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    border-radius: 8px;
-    z-index: 99999;
-    border: 1px solid var(--border);
-    margin-top: 5px;
-    overflow: hidden;
-}
-
-.dropdown-content a {
-    display: block;
-    padding: 12px 16px;
-    text-decoration: none;
-    color: var(--text-main);
-    font-size: 0.95rem;
-    margin: 0;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-}
-
-.dropdown-content a:hover {
-    background-color: var(--bg-color);
+    font-size: 0.9rem;
 }
 
 /* ==========================================================================
-   4. UI CARDS, FORMS & BUTTONS
+   4. COMPONENT SHAPES: CARDS, BUTTONS & FORMS
    ========================================================================== */
 .card {
     background-color: var(--card-bg);
-    padding: 1.5rem;
+    border: 1px solid var(--border);
     border-radius: 12px;
+    padding: 1.75rem;
     box-shadow: var(--shadow);
-    margin-bottom: 2rem;
-    border: 1px solid var(--border);
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-family: inherit;
-}
-
-.form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: 8px;
     border: none;
-    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
-    color: white;
-    font-family: inherit;
+    transition: all 0.2s ease;
 }
 
-.btn-primary { background-color: var(--primary); }
-.btn-primary:hover { background-color: var(--primary-hover); }
-.btn-danger { background-color: var(--danger); }
+.btn-primary {
+    background-color: var(--primary);
+    color: #ffffff !important;
+}
 
-.btn-icon {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger:hover {
+    background-color: var(--danger);
+    color: #ffffff;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--bg-color);
     color: var(--text-main);
-    margin-left: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
 }
 
 /* ==========================================================================
-   5. 365 ACTIVITY GRAPH (GITHUB TRACKER)
+   5. INTERACTIVE 365-DAY GITHUB ACTIVITY GRID SYSTEM
    ========================================================================== */
 .activity-grid-wrapper {
     width: 100%;
-    overflow-x: hidden;
     padding: 0.5rem 0;
 }
 
 .activity-grid {
-    display: grid;
-    grid-template-columns: repeat(53, 10px);
-    grid-template-rows: repeat(7, 10px);
-    gap: 3px;
-    margin: 1rem auto 0.5rem;
-    width: fit-content;
-    overflow: hidden !important;
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 4px;
+    align-content: flex-start;
+    overflow: hidden; 
+    max-width: 100%;
 }
 
-.activity-block {
-    width: 10px;
-    height: 10px;
-    background-color: var(--border);
-    border-radius: 2px;
-    transition: background-color 0.5s ease, transform 0.3s ease;
+.grid-box {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background-color: var(--grid-bg);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+    flex-shrink: 0; 
 }
 
-.activity-block[data-level="0"] { background-color: var(--border); }
-.activity-block[data-level="1"] { background-color: #0e4429; } 
-.activity-block[data-level="2"] { background-color: #006d32; } 
-.activity-block[data-level="3"] { background-color: #26a641; } 
-.activity-block[data-level="4"] { background-color: #39d353; }
+.grid-box[data-level="0"] { background-color: var(--grid-bg); }
+.grid-box[data-level="1"] { background-color: var(--lvl-1); }
+.grid-box[data-level="2"] { background-color: var(--lvl-2); }
+.grid-box[data-level="3"] { background-color: var(--lvl-3); }
+.grid-box[data-level="4"] { background-color: var(--lvl-4); }
 
-.activity-block.pulse-glow {
-    transform: scale(1.15);
-    box-shadow: 0 0 6px rgba(57, 211, 83, 0.8);
+.grid-box.today-highlight {
+    border: 2px solid #ff7a00 !important; 
+    box-shadow: 0 0 8px rgba(255, 122, 0, 0.8);
+    z-index: 10;
+}
+
+.grid-box.ambient-flash {
+    animation: pulseFadeGreen 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes pulseFadeGreen {
+    0% {
+        box-shadow: 0 0 0px rgba(16, 185, 129, 0);
+    }
+    30% {
+        background-color: var(--lvl-3);
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    }
+    100% {
+        box-shadow: 0 0 0px rgba(16, 185, 129, 0);
+    }
 }
 
 /* ==========================================================================
-   6. PROGRESS PERCENTAGE CIRCLES & DASHBOARD
-   ========================================================================== */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.stat-card {
-    background-color: var(--card-bg);
-    padding: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-}
-
-.circle {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin: 0 auto 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    background: conic-gradient(var(--primary) var(--percentage), var(--border) 0);
-}
-
-.circle span {
-    background-color: var(--card-bg);
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.empty-state-card {
-    text-align: center;
-    padding: 3rem 1.5rem;
-    border: 2px dashed var(--border);
-    background: transparent;
-    box-shadow: none;
-}
-
-.empty-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.empty-state-card h3 {
-    margin-bottom: 0.5rem;
-    color: var(--text-main);
-}
-
-.empty-state-card p {
-    color: var(--text-muted);
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* ==========================================================================
-   7. POMODORO TIMER LAYOUT & SVG CIRCLE
+   6. POMODORO FOCUS TIMER WORKSPACE OVERLAYS
    ========================================================================== */
 .timer-layout {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
+    display: flex;
     gap: 2rem;
     align-items: stretch;
 }
 
-@media (max-width: 768px) {
-    .timer-layout {
-        grid-template-columns: 1fr;
-        align-items: start;
-    }
-}
-
-.settings-sidebar label {
-    display: block;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 0.2rem;
-}
-
-.timer-display-pane {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2.5rem 1.5rem;
-}
-
-#sessionStatus {
-    font-size: 1.4rem;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.pomodoro-settings {
-    display: flex;
-    gap: 10px;
-    margin: 1.5rem 0;
-}
-
-.circle-container {
-    position: relative;
-    width: 280px;
-    height: 280px;
-    margin-bottom: 2rem;
-}
-
-.timer-svg {
-    width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
-}
-
-.timer-svg circle {
-    fill: transparent;
-    stroke-width: 8px;
-}
-
-.ring-bg {
-    stroke: var(--border);
-}
-
-.ring-progress {
-    stroke-dasharray: 565.48;
-    stroke-dashoffset: 0;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
-}
-
-.stage-green  { stroke: #10b981; }
-.stage-orange { stroke: #f59e0b; }
-.stage-red    { stroke: #ef4444; }
-.stage-break  { stroke: #3b82f6; }
-
-.clock-display {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3.5rem;
-    font-family: monospace;
-    font-weight: 700;
-    margin: 0;
-    color: var(--primary);
-}
-
-.timer-controls {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2.5rem;
-}
-
-/* ==========================================================================
-   8. DYNAMIC INTERACTIVE TIMELINE STYLES
-   ========================================================================== */
-.timeline-container {
-    width: 100%;
-    max-width: 550px;
-    margin: 1rem auto 0;
-    padding: 0 10px;
-}
-
-.timeline-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-
-.timeline-tracker-track {
-    position: relative;
-    height: 24px;
-    background-color: var(--border);
-    border-radius: 6px;
-    display: flex;
-    overflow: visible;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-}
+.ring-bg { stroke: var(--border); }
+.ring-progress { stroke-linecap: round; }
+.ring-progress.stage-green { stroke: #10b981; }
+.ring-progress.stage-break { stroke: #3b82f6; }
 
 .timeline-segment {
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
-    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #ffffff;
+    user-select: none;
+    border-right: 1px solid var(--card-bg);
+}
+
+.timeline-segment:last-child {
+    border-right: none;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.timeline-segment:first-of-type {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.segment-focus { background-color: #10b981 !important; }
+.segment-break { background-color: #3b82f6 !important; }
+
+/* ==========================================================================
+   7. GLOBAL VIEWPORT FIXED TIMELINE BAR STYLE LAWS
+   ========================================================================== */
+.global-timeline-toolbar {
+    width: 100%;
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 9999;
+}
+
+.global-timeline-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
     font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    border-right: 1px solid rgba(254, 254, 254, 0.15);
+    color: var(--text-main);
+}
+
+.global-timeline-meta .pct-pill {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--primary);
+}
+
+.global-timeline-track {
     position: relative;
-    white-space: nowrap;
-}
-
-.segment-focus {
-    background: linear-gradient(90deg, #6366f1, #4f46e5);
-}
-
-.segment-break {
-    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    height: 24px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    overflow: visible;
+    padding: 2px;
+    width: 100%;
 }
 
 .timeline-indicator-arrow {
     position: absolute;
-    top: 0;
+    top: -4px;
     left: 0%;
-    width: 2px;
-    height: 24px;
-    background-color: #f59e0b;
-    z-index: 10;
-    transition: left 0.5s ease;
-    box-shadow: 0 0 4px #f59e0b;
+    width: 4px;
+    height: 30px;
+    background-color: #f97316;
+    z-index: 100;
+    transition: left 1s linear;
+    box-shadow: 0 0 8px #f97316;
+    border-radius: 2px;
     transform: translateX(-50%);
 }
 
-.timeline-indicator-arrow::before {
-    content: '▼';
-    position: absolute;
-    top: -13px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #f59e0b;
-    font-size: 11px;
-    line-height: 1;
-}
-
 /* ==========================================================================
-   9. DIARY FEED
-   ========================================================================== */
-.post-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-.post-header {
-    display: flex;
-    justify-content: space-between;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-}
-
-.post-image-placeholder {
-    width: 100%;
-    height: 200px;
-    background-color: var(--bg-color);
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    border-radius: 6px;
-}
-
-/* ==========================================================================
-   10. PERSISTENT MINI OVERLAY TIMER BAR
-   ========================================================================== */
-.mini-timer-bar {
-    position: fixed !important;
-    bottom: 50px !important; 
-    left: 0 !important;
-    width: 100% !important;
-    background-color: var(--nav-bg);
-    border-top: 2px solid var(--primary);
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
-    padding: 0.75rem 2rem;
-    z-index: 9998 !important;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-}
-
-.hidden-overlay {
-    transform: translateY(120%);
-    opacity: 0;
-    pointer-events: none;
-}
-
-.mini-timer-content {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.mini-status-block {
-    display: flex;
-    align-items: center;
-    font-size: 1.1rem;
-    color: var(--text-main);
-}
-
-.mini-status-block #miniSessionStatus {
-    font-weight: 500;
-}
-
-.mini-divider {
-    margin: 0 10px;
-    color: var(--border);
-}
-
-.mini-status-block #miniTimeDisplay {
-    font-family: monospace;
-    font-size: 1.4rem;
-    color: var(--primary);
-}
-
-.mini-controls-block {
-    display: flex;
-    gap: 10px;
-}
-
-.btn-small {
-    padding: 6px 14px;
-    font-size: 0.85rem;
-    border-radius: 4px;
-}
-
-/* ==========================================================================
-   11. MAIN SITE FOOTER
+   8. PRODUCTION BASE FOOTER LAYOUT
    ========================================================================== */
 .main-footer {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 50px !important;
-    z-index: 9999 !important;
-    background-color: var(--nav-bg);
+    background-color: var(--card-bg);
     border-top: 1px solid var(--border);
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.9rem;
+    padding: 1.5rem 2rem;
+    text-align: center;
     color: var(--text-muted);
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    font-size: 0.9rem;
+    margin-top: auto;
 }
 
-.main-footer p {
-    margin: 0;
-    padding: 0;
-}
+.main-footer strong { color: var(--text-main); }
 
-.main-footer strong {
-    color: var(--primary);
+/* Absolute layout override enforces display none safely over flex layouts */
+.hidden-overlay { 
+    display: none !important; 
 }
 
 /* ==========================================================================
-   12. HABIT MANAGEMENT UTILITY MODULE
+   9. SYSTEM RE-ENGINEERED MODAL INTERFACES & MANAGE UTILITIES
    ========================================================================== */
-.manage-habits-list {
-    margin-top: 3rem;
+.custom-modal-backdrop {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(15, 23, 42, 0.6); 
+    backdrop-filter: blur(4px); 
+    display: none; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 99999;
 }
 
-.habit-management-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.custom-modal-card {
+    max-width: 460px; 
+    width: 90%; 
+    text-align: center; 
+    padding: 2rem; 
+    border: 1px solid var(--border); 
+    box-shadow: var(--shadow); 
+    border-radius: 12px; 
     background-color: var(--card-bg);
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    margin-bottom: 1rem;
-    transition: transform 0.2s ease;
+    animation: modalSlideUpReveal 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.habit-management-card:hover {
-    transform: translateY(-2px);
+@keyframes modalSlideUpReveal {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.habit-info-block h4 {
-    font-size: 1.1rem;
-    color: var(--text-main);
-    margin-bottom: 0.25rem;
+.source-url-row {
+    display: flex; 
+    gap: 10px; 
+    align-items: center;
+    width: 100%;
 }
 
-.habit-info-block p {
-    font-size: 0.85rem;
-    color: var(--text-muted);
+.btn-square-append {
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    font-size: 1.15rem; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    border: none; 
+    font-weight: bold; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.habit-controls-block {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.btn-inline-edit {
-    background-color: var(--primary);
-    padding: 6px 12px;
-    font-size: 0.85rem;
-}
-.btn-inline-edit:hover { background-color: var(--primary-hover); }
-
-/* FIXED: Re-engineered dynamic visibility token filtering mapping framework profiles */
 input[type="datetime-local"]::-webkit-calendar-picker-indicator,
 input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: var(--invert-value) !important;
+    filter: invert(56%) sepia(85%) saturate(415%) hue-rotate(113deg) brightness(92%) contrast(89%);
     cursor: pointer;
 }
 
 /* ==========================================================================
-   13. CROSS-PLATFORM LAYOUT RESPONSIVE GRID ENGINE
+   10. RIGHT-TO-LEFT (RTL) LIQUID DIRECTIONAL MIRROR GRAPH ARCHITECTURE
    ========================================================================== */
-@media (max-width: 599px) {
+html[dir="rtl"] {
+    text-align: right;
+}
+
+html[dir="rtl"] .nav-links a {
+    margin-left: 0;
+}
+
+html[dir="rtl"] .timer-layout {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .timeline-segment {
+    border-right: none;
+    border-left: 1px solid var(--card-bg);
+}
+
+html[dir="rtl"] .timeline-segment:last-child {
+    border-left: none;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+html[dir="rtl"] .timeline-segment:first-of-type {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+html[dir="rtl"] .btn {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .source-url-row {
+    flex-direction: row-reverse;
+}
+
+
+/* ==========================================================================
+   11. FLUID RESPONSIVE MEDIA BREAKPOINT MATRIX
+   ========================================================================== */
+
+/* Ultra-Wide Screens & Smart TVs */
+@media screen and (min-width: 1400px) {
     .container {
-        padding: 1rem;
+        max-width: 1320px;
+    }
+    body {
+        font-size: 16px;
+    }
+}
+
+/* Medium Desktops & Standard Laptops */
+@media screen and (max-width: 1200px) {
+    .container {
+        max-width: 960px;
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* Large Tablets & Small Laptop Form Factors */
+@media screen and (max-width: 992px) {
+    .container {
+        max-width: 720px;
+    }
+    .profile-details-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+    }
+    .timer-layout {
+        flex-direction: column !important;
+        align-items: stretch;
+    }
+    .settings-sidebar {
+        width: 100%;
+    }
+}
+
+/* Medium Tablets & Mobile Landscape Viewports */
+@media screen and (max-width: 768px) {
+    .container {
+        max-width: 540px;
+        padding: 1.25rem 1rem;
     }
     .navbar {
         flex-direction: column;
@@ -683,106 +514,74 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     .nav-links {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 0.25rem;
+        gap: 8px;
     }
-    .nav-links a {
-        margin: 0 0.5rem;
-        font-size: 0.9rem;
-    }
-    .activity-grid-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    .habit-management-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    .habit-controls-block {
-        width: 100%;
-    }
-    .habit-controls-block .btn {
-        flex: 1;
-        text-align: center;
-    }
-    .mini-timer-content {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-}
-
-@media (min-width: 600px) and (max-width: 1024px) {
-    .container {
-        max-width: 100%;
-        padding: 1.5rem;
-    }
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1440px) {
-    .container {
-        max-width: 1320px;
-    }
-    .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-@media (min-width: 2400px) {
-    .container {
-        max-width: 2100px;
-        padding: 4rem;
-    }
-    body {
-        font-size: 1.25rem;
-    }
-    .logo a {
-        font-size: 2.25rem;
-    }
-    .nav-links a {
-        font-size: 1.3rem;
-        margin: 0 1.5rem;
-    }
-    .btn-profile {
-        font-size: 1.3rem;
-    }
-    .card {
-        padding: 2.5rem;
-        border-radius: 20px;
-    }
-    .stats-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 2rem;
-    }
-    .circle {
-        width: 140px;
-        height: 140px;
-        font-size: 2rem;
-    }
-    .circle span {
-        width: 114px;
-        height: 114px;
+    .nav-underline-indicator {
+        display: none !important; /* Hide sliding line track to prevent execution layout clips */
     }
     .activity-grid {
-        grid-template-columns: repeat(53, 16px);
-        grid-template-rows: repeat(7, 16px);
-        gap: 4px;
+        justify-content: center;
     }
-    .activity-block {
-        width: 16px;
-        height: 16px;
+    .stats-grid {
+        grid-template-columns: 1fr !important;
     }
-    input, select, textarea {
-        padding: 14px;
-        font-size: 1.15rem;
+}
+
+/* Smartphones & Small Portables */
+@media screen and (max-width: 576px) {
+    .container {
+        max-width: 100%;
+        padding: 1rem;
     }
-    .btn {
-        padding: 14px 28px;
-        font-size: 1.15rem;
+    .card {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    h1 { font-size: 1.75rem !important; }
+    h2 { font-size: 1.4rem !important; }
+    h3 { font-size: 1.2rem !important; }
+    
+    .timer-controls {
+        max-width: 100% !important;
+    }
+    .circle-container {
+        width: 260px !important;
+        height: 260px !important;
+    }
+    .timer-svg {
+        width: 260px !important;
+        height: 260px !important;
+    }
+    .clock-display {
+        font-size: 3.25rem !important;
+    }
+    /* Enforce date/datetime field optimization layers */
+    input[type="date"], input[type="datetime-local"], select {
+        width: 100% !important;
+    }
+}
+
+/* Micro Devices & Narrow Displays */
+@media screen and (max-width: 400px) {
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+    }
+    .nav-item {
+        width: 100%;
+        justify-content: center;
+        padding: 0.65rem;
+    }
+    .theme-switch-container, .lang-switch-container {
+        margin: 8px 0 !important;
+    }
+    .source-url-row {
+        flex-direction: column !important;
+        align-items: stretch;
+        gap: 6px;
+    }
+    .btn-square-append {
+        width: 100%;
+        height: 38px;
     }
 }

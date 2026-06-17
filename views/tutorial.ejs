@@ -1,0 +1,36 @@
+<%- include('partials/header') %>
+
+<style>
+    #globalTimelineToolbar {
+        display: none !important;
+    }
+</style>
+
+<div style="margin-bottom: 2.5rem; text-align: center;">
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;" data-i18n="tut_heading">Tutorial: How to use Habiter</h1>
+    <p style="color: var(--primary); font-size: 1.1rem; font-weight: 600; margin-top: 6px; letter-spacing: 0.2px;" data-i18n="tut_subheading">Best habit tracker all in one place</p>
+</div>
+
+<div style="max-width: 900px; margin: 0 auto 3rem;">
+    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: var(--shadow);">
+        
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; border: 1px solid var(--border); background: #000000;">
+            <iframe 
+                src="https://www.youtube.com/embed/PLACEHOLDER_VIDEO_ID?modestbranding=1&rel=0&showinfo=0" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div style="margin-top: 1.75rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+            <h3 style="color: var(--text-main); font-weight: 700; font-size: 1.25rem; margin-bottom: 10px;" data-i18n="tut_guide_title">Quick System Guide Index</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;" data-i18n="tut_guide_desc">
+                Watch the master overview video above to walk through your tracking ledger maps. Learn how to launch daily deep-focus cycles via the Pomodoro timer, append source reference URLs onto custom habit configurations, map metrics logs on the historical summary grid, and compile custom timeline reports effortlessly.
+            </p>
+        </div>
+        
+    </div>
+</div>
+
+<%- include('partials/footer') %>

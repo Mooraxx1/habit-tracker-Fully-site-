@@ -1,15 +1,16 @@
 <%- include('partials/header') %>
 
 <div class="page-header" style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);" data-i18n="diary_title">My Diary Wall</h1>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;" data-i18n="diary_title">My Diary Wall</h1>
 </div>
 
-<div class="card create-post" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 2rem;">
+<div class="card create-post" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.75rem; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 2.5rem;">
     <form action="/api/diary" method="POST" enctype="multipart/form-data">
-        <div class="form-group" style="margin-bottom: 1rem;">
-            <label for="diaryHabitSelect" style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; color: var(--text-main);">Link to Habit (Optional)</label>
-            <select name="habitTagged" id="diaryHabitSelect" style="width: 100%; padding: 10px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit;">
-                <option value="" style="background-color: var(--card-bg); color: var(--text-main);" selected>General Achievement / Un-tagged</option>
+        
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="diaryHabitSelect" style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.95rem; color: var(--text-main);" data-i18n="diary_habit_label">Link to Habit (Optional)</label>
+            <select name="habitTagged" id="diaryHabitSelect" style="width: 100%; padding: 12px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem; cursor: pointer;">
+                <option value="" style="background-color: var(--card-bg); color: var(--text-main);" selected data-i18n="diary_habit_placeholder">Select your habit / Optional</option>
                 <% if (typeof habits !== 'undefined' && habits && habits.length > 0) { %>
                     <% habits.forEach(habit => { %>
                         <option value="<%= habit.id %>" style="background-color: var(--card-bg); color: var(--text-main);"><%= habit.name %></option>
@@ -18,48 +19,93 @@
             </select>
         </div>
 
-        <div class="form-group" style="margin-bottom: 1rem;">
-            <textarea name="content" placeholder="What did you achieve today?" rows="3" required style="width: 100%; padding: 12px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+            <textarea name="content" placeholder="What did you achieve today?" data-i18n="placeholder_diary_textarea" rows="4" required style="width: 100%; padding: 14px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 1rem; resize: vertical; line-height: 1.5;"></textarea>
         </div>
 
-        <div class="post-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-            <input type="file" name="postImage" accept="image/*" id="fileUpload" style="width: auto; border: none; padding: 0; background: transparent; margin: 0; color: var(--text-muted); font-size: 0.9rem;">
-            <button type="submit" class="btn btn-primary" style="padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer;" data-i18n="btn_post">Post</button>
+        <div class="post-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="fileUpload" style="font-weight: 600; font-size: 0.9rem; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: var(--bg-color); border: 1px solid var(--border); border-radius: 6px;" data-i18n="upload_files_label">
+                    📁 Upload Photos / Files
+                </label>
+                <input type="file" name="postImage" accept="image/*" id="fileUpload" style="display: none;" onchange="document.getElementById('fileStatusIndicator').innerText = this.files[0] ? '✓ ' + this.files[0].name : ''">
+                <span id="fileStatusIndicator" style="font-size: 0.85rem; color: var(--text-muted); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+            </div>
+            <button type="submit" class="btn btn-primary" style="padding: 12px 28px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.95rem; letter-spacing: 0.3px; border: none;" data-i18n="btn_post">Post</button>
         </div>
     </form>
 </div>
 
-<div class="feed" style="display: flex; flex-direction: column; gap: 1.5rem;">
+<div class="feed" style="display: flex; flex-direction: column; gap: 1.75rem;">
     <% if (typeof posts !== 'undefined' && posts && posts.length > 0) { %>
         <% posts.forEach(post => { %>
-            <div class="card post" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow);">
-                <div class="post-header" style="display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
-                    <strong style="color: var(--text-main); font-weight: 700;"><%= post.date %></strong>
-                    <span><%= post.time %></span>
+            <div class="card post" id="postCard_<%= post.id %>" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.75rem; border-radius: 12px; box-shadow: var(--shadow); transition: transform 0.2s ease, opacity 0.2s ease; position: relative;">
+                
+                <div class="post-header" style="display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    <div>
+                        <strong style="color: var(--text-main); font-weight: 700;"><%= post.date %></strong>
+                        <span style="font-weight: 500; margin-left: 8px; margin-right: 8px;"><%= post.time %></span>
+                    </div>
+                    <div class="post-mgmt-actions" style="display: flex; gap: 12px; font-weight: 700;">
+                        <button type="button" onclick="activateInlineDiaryEditor('<%= post.id %>')" style="background: transparent; border: none; color: var(--primary); cursor: pointer; font-size: 0.85rem; font-weight: inherit;" data-i18n="btn_edit_icon">✏️ Edit</button>
+                        <button type="button" onclick="openDiaryDeleteModal('<%= post.id %>')" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 0.85rem; font-weight: inherit;" data-i18n="btn_delete_icon">🗑️ Delete</button>
+                    </div>
                 </div>
                 
                 <% if (post.habitName) { %>
-                    <span class="badge-tag" style="background-color: var(--primary); color: #ffffff; padding: 3px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                        🎯 <%= post.habitName %>
-                    </span>
+                    <div style="margin-bottom: 12px;" id="postHabitWrapper_<%= post.id %>">
+                        <span class="badge-tag" style="background-color: var(--primary); color: #ffffff; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            🎯 <%= post.habitName %>
+                        </span>
+                    </div>
                 <% } %>
 
-                <p style="color: var(--text-main); font-size: 1rem; line-height: 1.5; word-break: break-word;"><%= post.content %></p>
+                <p id="postTextDisplay_<%= post.id %>" style="color: var(--text-main); font-size: 1.05rem; line-height: 1.6; word-break: break-word; white-space: pre-line; margin: 0;"><%= post.content %></p>
+                
+                <div id="postEditorZone_<%= post.id %>" style="display: none; flex-direction: column; gap: 10px; margin-top: 5px; width: 100%;">
+                    <textarea id="editTextarea_<%= post.id %>" rows="3" style="width: 100%; padding: 12px; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--primary); border-radius: 8px; font-family: inherit; font-size: 1rem; resize: vertical; line-height: 1.5;"><%= post.content %></textarea>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" onclick="openDiaryEditModal('<%= post.id %>')" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.85rem; border-radius: 6px;" data-i18n="btn_save">Save</button>
+                        <button type="button" onclick="cancelInlineDiaryEditor('<%= post.id %>')" class="btn" style="padding: 6px 16px; font-size: 0.85rem; background-color: var(--border); color: var(--text-main); border-radius: 6px;" data-i18n="btn_cancel">Cancel</button>
+                    </div>
+                </div>
                 
                 <% if (post.imageUrl) { %>
-                    <div class="post-image-container" style="margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow);">
-                        <img src="<%= post.imageUrl %>" alt="Post Achievement Image" style="width: 100%; height: auto; display: block; object-fit: cover;">
+                    <div class="post-image-container" style="margin-top: 16px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow);">
+                        <img src="<%= post.imageUrl %>" alt="Post Achievement Image" style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 500px;">
                     </div>
                 <% } %>
             </div>
         <% }) %>
     <% } else { %>
-        <div class="card empty-state-card" style="text-align: center; border: 2px dashed var(--border); background: transparent; box-shadow: none; padding: 4rem 2rem; border-radius: 12px;">
-            <div class="empty-icon" style="font-size: 3.5rem; margin-bottom: 1rem;">✍️</div>
-            <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">Your memory wall is empty</h3>
-            <p style="color: var(--text-muted); max-width: 440px; margin: 0 auto; font-size: 0.95rem; line-height: 1.4;">Document your daily progression steps. Log updates above to populate your profile feed history.</p>
+        <div class="card empty-state-card" style="text-align: center; border: 2px dashed var(--border); background: transparent; box-shadow: none; padding: 5rem 2rem; border-radius: 12px;">
+            <div class="empty-icon" style="font-size: 4rem; margin-bottom: 1rem;">✍️</div>
+            <h3 style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;" data-i18n="empty_diary_title">Your memory wall is empty</h3>
+            <p style="color: var(--text-muted); max-width: 460px; margin: 0 auto; font-size: 1rem; line-height: 1.5;" data-i18n="empty_diary_desc">Document your daily progression steps. Log updates above to populate your profile feed history.</p>
         </div>
     <% } %>
+</div>
+
+<div id="diaryEditConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center;">
+    <div class="card" style="max-width: 400px; width: 90%; text-align: center; padding: 2rem; border-radius: 12px; background-color: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow);">
+        <h3 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800; font-size: 1.35rem; letter-spacing: -0.3px;" data-i18n="diary_edit_modal_title">Save Changes?</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;" data-i18n="diary_edit_modal_desc">Are you sure you want to update this diary entry text parameter?</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="confirmDiaryEditBtn" class="btn btn-primary" style="flex: 1; padding: 12px; font-weight: 700; border-radius: 8px;" data-i18n="btn_yes_save">Yes, Save</button>
+            <button id="cancelDiaryEditModalBtn" class="btn" style="flex: 1; background-color: var(--border); color: var(--text-main); padding: 12px; font-weight: 700; border-radius: 8px;" data-i18n="btn_cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="diaryDeleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center;">
+    <div class="card" style="max-width: 400px; width: 90%; text-align: center; padding: 2rem; border-radius: 12px; background-color: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow);">
+        <h3 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800; font-size: 1.35rem; letter-spacing: -0.3px;" data-i18n="diary_delete_modal_title">Delete Diary Entry?</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;" data-i18n="diary_delete_modal_desc">Are you sure you want to permanently delete this diary entry? This action cannot be undone.</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="confirmDiaryDeleteBtn" class="btn btn-danger" style="flex: 1; padding: 12px; font-weight: 700; border-radius: 8px;" data-i18n="btn_yes_delete">Yes, Delete</button>
+            <button id="cancelDiaryDeleteModalBtn" class="btn" style="flex: 1; background-color: var(--border); color: var(--text-main); padding: 12px; font-weight: 700; border-radius: 8px;" data-i18n="btn_cancel">Cancel</button>
+        </div>
+    </div>
 </div>
 
 <%- include('partials/footer') %>

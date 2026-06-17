@@ -1,30 +1,41 @@
 <%- include('partials/header') %>
 
 <div class="page-header" style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);" data-i18n="dashboard_title">Activity Overview</h1>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;" data-i18n="dashboard_title">Activity Overview</h1>
 </div>
 
-<div class="card" id="activityTrackerCard" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 2rem;">
-    <h3 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 700;" data-i18n="activity_graph">365-Day Activity</h3>
+<div class="card" id="activityTrackerCard">
+    <h3 style="margin-bottom: 0.25rem; color: var(--text-main); font-weight: 800; font-size: 1.25rem;" data-i18n="activity_graph">365-Day Activity Ledger</h3>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;" data-i18n="activity_graph_desc">Visual tracking matrix from January 1st to December 31st of the current year</p>
+    
     <div class="activity-grid-wrapper">
-        <div class="activity-grid" id="activityGraph" data-posts='<%= JSON.stringify(posts || []) %>'>
-        </div>
+        <div class="activity-grid" id="activityGraph" data-posts='<%= JSON.stringify(posts || []) %>'></div>
+    </div>
+
+    <div class="grid-legend" style="display: flex; justify-content: flex-end; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; padding-right: 4px;">
+        <span data-i18n="legend_less">Less</span>
+        <div class="legend-box level-0" style="width: 14px; height: 14px; background-color: var(--grid-bg); border-radius: 3px;"></div>
+        <div class="legend-box level-1" style="width: 14px; height: 14px; background-color: var(--lvl-1); border-radius: 3px;"></div>
+        <div class="legend-box level-2" style="width: 14px; height: 14px; background-color: var(--lvl-2); border-radius: 3px;"></div>
+        <div class="legend-box level-3" style="width: 14px; height: 14px; background-color: var(--lvl-3); border-radius: 3px;"></div>
+        <div class="legend-box level-4" style="width: 14px; height: 14px; background-color: var(--lvl-4); border-radius: 3px;"></div>
+        <span data-i18n="legend_more">More</span>
     </div>
 </div>
 
-<div class="stats-grid" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>' style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+<div class="stats-grid" id="habitsListCardContainer" data-habits='<%= JSON.stringify(habits || []) %>' style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
     <% if (typeof habits !== 'undefined' && habits && habits.length > 0) { %>
         <% habits.forEach(habit => { %>
             <% 
                let safeRequired = habit.requiredTime || 1;
                let percentage = Math.min(Math.round((habit.completedTime / safeRequired) * 100), 100); 
             %>
-            <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center; box-shadow: var(--shadow);">
-                <div class="circle" style="--percentage: <%= percentage %>%; width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; background: conic-gradient(var(--primary) var(--percentage), var(--border) 0);">
-                    <span style="background-color: var(--card-bg); color: var(--text-main); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><%= percentage %>%</span>
+            <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center; box-shadow: var(--shadow); transition: transform 0.2s ease;">
+                <div class="circle" style="--percentage: <%= percentage %>%; width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; background: conic-gradient(var(--primary) var(--percentage), var(--border) 0);">
+                    <span style="background-color: var(--card-bg); color: var(--text-main); width: 82px; height: 82px; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><%= percentage %>%</span>
                 </div>
-                <h4 style="color: var(--text-main); margin-bottom: 0.25rem; font-weight: 700; font-size: 1.1rem;"><%= habit.name %></h4>
-                <p style="color: var(--text-muted); font-size: 0.85rem;">Daily Progress Map</p>
+                <h4 style="color: var(--text-main); margin-bottom: 0.35rem; font-weight: 700; font-size: 1.15rem; word-break: break-word;"><%= habit.name %></h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500;" data-i18n="daily_progress_map">Daily Progress Map</p>
             </div>
         <% }) %>
     <% } else { %>
@@ -36,19 +47,108 @@
     <% } %>
 </div>
 
-<div class="card" style="margin-top: 2rem; border: 1px solid var(--border); background-color: var(--card-bg); box-shadow: var(--shadow); padding: 1.5rem; border-radius: 12px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+<div class="card" style="border: 1px solid var(--border); background-color: var(--card-bg); box-shadow: var(--shadow); padding: 1.75rem; border-radius: 12px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h3 style="color: var(--text-main); font-weight: 800; font-size: 1.25rem; margin: 0;">Summary of Achievement</h3>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Review logged focus times by specific calendar dates</p>
+            <h3 style="color: var(--text-main); font-weight: 800; font-size: 1.25rem; margin: 0;" data-i18n="summary_achievement_title">Summary of Achievement</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;" data-i18n="summary_achievement_desc">Select any historical date to review past tracked routines and completion hours</p>
         </div>
-        <div style="position: relative; width: 180px;">
-            <input type="date" id="summaryFilterDate" style="cursor: pointer; padding: 8px 12px; font-weight: 600; font-size: 0.9rem; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; width: 100%;" onclick="try { this.showPicker(); } catch(e) {}">
+        <div style="position: relative; width: 190px;">
+            <input type="date" id="summaryFilterDate" style="cursor: pointer; padding: 10px 14px; font-weight: 700; font-size: 0.9rem; background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; width: 100%; font-family: inherit;" onclick="try { this.showPicker(); } catch(e) {}">
         </div>
     </div>
 
-    <div class="stats-grid" id="summaryAchievementOutputGrid">
+    <div class="stats-grid" id="summaryAchievementOutputGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+        <div style="grid-column: 1/-1; text-align: center; padding: 2rem 0; color: var(--text-muted); font-style: italic; font-size: 0.95rem;" data-i18n="summary_picker_placeholder">
+            Pick a specific date above from the calendar input field to load your performance snapshot metrics.
+        </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const gridContainer = document.getElementById("activityGraph");
+    if (!gridContainer) return;
+    gridContainer.innerHTML = "";
+
+    const postsData = JSON.parse(gridContainer.getAttribute('data-posts') || '[]');
+    const habitsListCardContainer = document.getElementById('habitsListCardContainer');
+    const habitsData = habitsListCardContainer ? JSON.parse(habitsListCardContainer.getAttribute('data-habits') || '[]') : [];
+
+    const postCounts = {};
+    postsData.forEach(post => {
+        const dateObj = new Date(post.date);
+        const dateStr = dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        postCounts[dateStr] = (postCounts[dateStr] || 0) + 1;
+    });
+
+    let todayReq = 0;
+    let todayComp = 0;
+    habitsData.forEach(h => {
+        todayReq += (h.requiredTime || 1);
+        todayComp += (h.completedTime || 0);
+    });
+    let todayPercent = todayReq > 0 ? (todayComp / todayReq) * 100 : 0;
+
+    const currentYear = new Date().getFullYear();
+    const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    const totalDays = isLeapYear(currentYear) ? 366 : 365;
+
+    const today = new Date();
+    const todayYear = today.getFullYear();
+    const todayMonth = today.getMonth();
+    const todayDate = today.getDate();
+
+    const gridBoxes = [];
+
+    for (let i = 0; i < totalDays; i++) {
+        const boxDate = new Date(currentYear, 0, i + 1);
+        const dateString = boxDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        
+        const box = document.createElement("div");
+        box.classList.add("grid-box");
+        box.setAttribute("title", dateString);
+
+        let percent = 0;
+
+        if (currentYear === todayYear && boxDate.getMonth() === todayMonth && boxDate.getDate() === todayDate) {
+            percent = todayPercent;
+            box.classList.add("today-highlight");
+        } else if (boxDate <= today) {
+            const posts = postCounts[dateString] || 0;
+            if (posts === 1) percent = 30; 
+            else if (posts === 2) percent = 60; 
+            else if (posts === 3) percent = 80; 
+            else if (posts >= 4) percent = 100; 
+        }
+
+        let level = 0;
+        if (percent > 0 && percent <= 40) level = 1;
+        else if (percent > 40 && percent <= 69) level = 2;
+        else if (percent >= 70 && percent < 100) level = 3;
+        else if (percent >= 100) level = 4;
+
+        box.setAttribute("data-level", level.toString());
+        
+        gridContainer.appendChild(box);
+        gridBoxes.push(box);
+    }
+
+    setInterval(() => {
+        if (gridBoxes.length === 0) return;
+
+        const randomIndex = Math.floor(Math.random() * gridBoxes.length);
+        const targetBox = gridBoxes[randomIndex];
+
+        if (targetBox && !targetBox.classList.contains("today-highlight")) {
+            targetBox.style.animation = "pulseFadeGreen 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards";
+            
+            setTimeout(() => { 
+                targetBox.style.animation = ""; 
+            }, 3500); 
+        }
+    }, 1800);
+});
+</script>
 
 <%- include('partials/footer') %>

@@ -1,82 +1,355 @@
 <%- include('partials/header') %>
 
-<style>
-    /* Responsive adjustment for the profile layout container grid */
-    .profile-details-grid {
-        display: grid; 
-        grid-template-columns: 1fr 2fr; 
-        gap: 2rem;
-    }
-    @media (max-width: 768px) {
-        .profile-details-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
 <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-main);">Profile Details</h1>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;" data-i18n="profile_details_title">Profile Details</h1>
 </div>
 
-<div class="profile-details-grid">
+<div class="profile-details-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-bottom: 2rem;">
+    
     <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center; box-shadow: var(--shadow); height: fit-content;">
         
-        <% if (user.avatarUrl && user.avatarUrl.trim() !== "") { %>
+        <% if (user && user.avatarUrl && user.avatarUrl.trim() !== "") { %>
             <div style="width: 100px; height: 100px; margin: 0 auto 1rem; border-radius: 50%; overflow: hidden; border: 3px solid var(--primary); box-shadow: var(--shadow);">
                 <img src="<%= user.avatarUrl %>" alt="Profile Avatar" style="width: 100%; height: 100%; object-fit: cover; display: block;">
             </div>
-        <% } else { %>
+        <% } else if (user && user.username) { %>
             <div style="width: 100px; height: 100px; background: var(--primary); color: #ffffff; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; box-shadow: var(--shadow);">
                 <%= user.username.charAt(0).toUpperCase() %>
             </div>
         <% } %>
 
-        <a href="/profile/settings" style="display: inline-block; font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px dashed var(--primary);">
+        <a href="/settings/account" style="display: inline-block; font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px dashed var(--primary); padding-bottom: 1px;" data-i18n="change_picture_label">
             📸 Change Picture
         </a>
 
-        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 700;">
-            <%= user.displayName && user.displayName.trim() !== "" ? user.displayName : user.username %>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 700; word-break: break-word;">
+            <%= (user && user.displayName && user.displayName.trim() !== "") ? user.displayName : (user ? user.username : 'User') %>
         </h2>
         
-        <% if (user.displayName && user.displayName.trim() !== "") { %>
+        <% if (user && user.displayName && user.displayName.trim() !== "") { %>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">@<%= user.username %></p>
         <% } %>
 
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 1rem 0;">
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
 
-        <p style="color: var(--text-muted); font-size: 0.95rem; font-style: italic; line-height: 1.4; word-break: break-word; padding: 0 10px;">
-            <%= user.bio && user.bio.trim() !== "" ? user.bio : "No personalization biography written yet." %>
+        <p style="color: var(--text-muted); font-size: 0.95rem; font-style: italic; line-height: 1.5; word-break: break-word; padding: 0 10px; margin: 0;">
+            <%= (user && user.bio && user.bio.trim() !== "") ? user.bio : "No personalization biography written yet." %>
+            <% if (!(user && user.bio && user.bio.trim() !== "")) { %>
+                <span style="display:none;" data-i18n="empty_bio_msg">No personalization biography written yet.</span>
+            <% } %>
         </p>
     </div>
 
     <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow);">
-        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--text-main); font-weight: 700;">Habit Completion Statistics</h3>
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--text-main); font-weight: 800; letter-spacing: -0.3px;" data-i18n="habit_stats_title">Habit Completion Statistics</h3>
         
-        <% if (user.habits && user.habits.length > 0) { %>
+        <% if (user && user.habits && user.habits.length > 0) { %>
             <% user.habits.forEach(habit => { %>
                 <% 
                     let safeRequiredTime = habit.requiredTime || 1;
                     let percentage = Math.min(Math.round((habit.completedTime / safeRequiredTime) * 100), 100); 
                 %>
                 <div style="margin-bottom: 1.5rem; background: var(--bg-color); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border); transition: background-color 0.3s ease;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-weight: 600;">
-                        <span style="color: var(--text-main);"><%= habit.name %></span>
-                        <span style="color: var(--primary);"><%= percentage %>%</span>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-weight: 700; font-size: 0.95rem;">
+                        <span style="color: var(--text-main); word-break: break-word; margin-right: 1rem; margin-left: 1rem;"><%= habit.name %></span>
+                        <span style="color: var(--primary); white-space: nowrap;"><%= percentage %>%</span>
                     </div>
+                    
                     <div style="background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);">
                         <div style="background: var(--primary); height: 100%; width: <%= percentage %>%; transition: width 0.4s ease; border-radius: 5px;"></div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
-                        <span>Logged: <strong style="color: var(--text-main);"><%= habit.completedTime.toFixed(1) %></strong> hrs</span>
-                        <span>Target: <strong><%= safeRequiredTime %></strong> hrs</span>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+                        <span><span data-i18n="logged_label">Logged:</span> <strong style="color: var(--text-main);"><%= habit.completedTime.toFixed(1) %></strong> <span data-i18n="unit_hours">hrs</span></span>
+                        <span><span data-i18n="target_label">Target:</span> <strong style="color: var(--text-main);"><%= safeRequiredTime %></strong> <span data-i18n="unit_hours">hrs</span></span>
                     </div>
                 </div>
             <% }) %>
         <% } else { %>
-            <p style="color: var(--text-muted); text-align: center; padding: 4rem 0; font-style: italic;">No tracking routines initialized yet. Go to your management tab to get started!</p>
+            <div style="text-align: center; padding: 4rem 1.5rem; color: var(--text-muted); font-style: italic; font-size: 0.95rem;" data-i18n="empty_profile_stats_msg">
+                No tracking routines initialized yet. Go to your management tab to get started!
+            </div>
         <% } %>
     </div>
 </div>
+
+<div class="card" id="analyticsMasterWrapperContainer" data-habits-log='<%= JSON.stringify(user.habits || []) %>' style="border: 1px solid var(--border); background-color: var(--card-bg); box-shadow: var(--shadow); padding: 2rem; border-radius: 12px; width: 100%;">
+    <div style="border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--text-main); font-weight: 800; font-size: 1.4rem; margin: 0;" data-i18n="analytics_title">Comprehensive Metrics & Historic Reports</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;" data-i18n="analytics_desc">Review deep performance summaries across micro-date points and macro-yearly milestones</p>
+        
+        <div style="display: flex; gap: 0.5rem; margin-top: 1.25rem; flex-wrap: wrap;">
+            <button type="button" class="analytics-tab-btn active" onclick="switchAnalyticsScope('daily')" data-i18n="tab_daily" style="padding: 10px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main);">📅 Daily Hour Track</button>
+            <button type="button" class="analytics-tab-btn" onclick="switchAnalyticsScope('weekly')" data-i18n="tab_weekly" style="padding: 10px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main);">📊 Weekly Breakdown</button>
+            <button type="button" class="analytics-tab-btn" onclick="switchAnalyticsScope('monthly')" data-i18n="tab_monthly" style="padding: 10px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main);">📈 Monthly Analytics</button>
+            <button type="button" class="analytics-tab-btn" onclick="switchAnalyticsScope('yearly')" data-i18n="tab_yearly" style="padding: 10px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main);">🚀 Yearly Milestone</button>
+        </div>
+    </div>
+
+    <div style="background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+        <div id="panel_daily" class="analytics-filter-panel">
+            <label style="display: block; font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-bottom: 8px;" data-i18n="label_daily_date">Select Calendar Date Reference:</label>
+            <input type="date" id="input_daily_date" onchange="computeDailyAnalyticsSummary()" onclick="try { this.showPicker(); } catch(e) {}" style="padding: 10px 14px; font-weight: 600; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; width: 220px; cursor: pointer;">
+        </div>
+
+        <div id="panel_weekly" class="analytics-filter-panel" style="display: none; gap: 1rem; flex-wrap: wrap;">
+            <div>
+                <label style="display: block; font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-bottom: 8px;" data-i18n="label_weekly_month">Target Month:</label>
+                <select id="input_weekly_month" onchange="computeWeeklyAnalyticsSummary()" style="padding: 10px 14px; font-weight: 600; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; width: 160px; cursor: pointer;">
+                    <option value="01" data-i18n="opt_jan">January</option>
+                    <option value="02" data-i18n="opt_feb">February</option>
+                    <option value="03" data-i18n="opt_mar">March</option>
+                    <option value="04" data-i18n="opt_apr">April</option>
+                    <option value="05" data-i18n="opt_may">May</option>
+                    <option value="06" data-i18n="opt_jun">June</option>
+                    <option value="07" data-i18n="opt_jul">July</option>
+                    <option value="08" data-i18n="opt_aug">August</option>
+                    <option value="09" data-i18n="opt_sep">September</option>
+                    <option value="10" data-i18n="opt_oct">October</option>
+                    <option value="11" data-i18n="opt_nov">November</option>
+                    <option value="12" data-i18n="opt_dec">December</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-bottom: 8px;" data-i18n="label_weekly_index">Target Week Block Index:</label>
+                <select id="input_weekly_index" onchange="computeWeeklyAnalyticsSummary()" style="padding: 10px 14px; font-weight: 600; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; width: 180px; cursor: pointer;">
+                    <option value="1" data-i18n="opt_week_1">Week 1 (Days 1 - 7)</option>
+                    <option value="2" data-i18n="opt_week_2">Week 2 (Days 8 - 14)</option>
+                    <option value="3" data-i18n="opt_week_3">Week 3 (Days 15 - 21)</option>
+                    <option value="4" data-i18n="opt_week_4">Week 4 (Days 22 - End)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="panel_monthly" class="analytics-filter-panel" style="display: none;">
+            <label style="display: block; font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-bottom: 8px;" data-i18n="label_monthly_select">Select Ledger Month Block:</label>
+            <select id="input_monthly_select" onchange="computeMonthlyAnalyticsSummary()" style="padding: 10px 14px; font-weight: 600; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; width: 220px; cursor: pointer;">
+                <option value="01" data-i18n="opt_jan">January</option>
+                <option value="02" data-i18n="opt_feb">February</option>
+                <option value="03" data-i18n="opt_mar">March</option>
+                <option value="04" data-i18n="opt_apr">April</option>
+                <option value="05" data-i18n="opt_may">May</option>
+                <option value="06" data-i18n="opt_jun">June</option>
+                <option value="07" data-i18n="opt_jul">July</option>
+                <option value="08" data-i18n="opt_aug">August</option>
+                <option value="09" data-i18n="opt_sep">September</option>
+                <option value="10" data-i18n="opt_oct">October</option>
+                <option value="11" data-i18n="opt_nov">November</option>
+                <option value="12" data-i18n="opt_dec">December</option>
+            </select>
+        </div>
+
+        <div id="panel_yearly" class="analytics-filter-panel" style="display: none;">
+            <p style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-muted);"><span data-i18n="yearly_panel_msg">Compiling and running complete analytics overview evaluation engine parameters maps for current year:</span> <strong style="color: var(--primary);" id="displayYearlyTargetStringLabel">2026</strong></p>
+        </div>
+    </div>
+
+    <div id="analyticsTerminalResponseViewport" style="background: var(--bg-color); border: 1px solid var(--border); padding: 1.75rem; border-radius: 8px; min-height: 140px;">
+        <div style="text-align: center; color: var(--text-muted); font-style: italic; font-size: 0.95rem; padding-top: 1.5rem;" data-i18n="analytics_viewport_placeholder">
+            Please interact with options or change target input fields to load metrics dashboards maps cleanly.
+        </div>
+    </div>
+</div>
+
+<style>
+    .analytics-tab-btn.active {
+        background-color: var(--primary) !important;
+        color: #ffffff !important;
+        border-color: var(--primary) !important;
+    }
+</style>
+
+<script>
+    let rawHabitCollectionLedger = [];
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        const structuralDataNode = document.getElementById("analyticsMasterWrapperContainer");
+        if (structuralDataNode) {
+            rawHabitCollectionLedger = JSON.parse(structuralDataNode.getAttribute("data-habits-log") || "[]");
+        }
+        
+        const displayYearNode = document.getElementById("displayYearlyTargetStringLabel");
+        if(displayYearNode) displayYearNode.textContent = new Date().getFullYear();
+
+        const initialDateInput = document.getElementById("input_daily_date");
+        if(initialDateInput) {
+            initialDateInput.value = new Date().toISOString().split('T')[0];
+            computeDailyAnalyticsSummary();
+        }
+    });
+
+    // Listen to custom layout context language switch mutations cleanly
+    window.addEventListener("languageChangedOverrideLoop", () => {
+        const activeScopeButton = document.querySelector(".analytics-tab-btn.active");
+        if (activeScopeButton) activeScopeButton.click();
+    });
+
+    function switchAnalyticsScope(targetScope) {
+        document.querySelectorAll(".analytics-tab-btn").forEach(btn => btn.classList.remove("active"));
+        event.currentTarget.classList.add("active");
+        document.querySelectorAll(".analytics-filter-panel").forEach(panel => panel.style.display = "none");
+        
+        if (targetScope === 'weekly') {
+            document.getElementById("panel_weekly").style.display = "flex";
+            computeWeeklyAnalyticsSummary();
+        } else {
+            document.getElementById(`panel_${targetScope}`).style.display = "block";
+            if (targetScope === 'daily') computeDailyAnalyticsSummary();
+            if (targetScope === 'monthly') computeMonthlyAnalyticsSummary();
+            if (targetScope === 'yearly') computeYearlyAnalyticsSummary();
+        }
+    }
+
+    function createSummaryBreakdownViewHTML(totalHours, itemsMap) {
+        const currentLang = localStorage.getItem("language") || "en";
+
+        if(totalHours === 0) {
+            const emptyMsg = currentLang === "ar" 
+                ? "لا توجد سجلات تتبع مضافة تقع ضمن نطاق التحديد الحالي." 
+                : "No logged tracking progress records exist within this specified framework parameter scope.";
+            return `<div style="text-align: center; color: var(--text-muted); padding: 1.5rem 0; font-style: italic;">${emptyMsg}</div>`;
+        }
+
+        let dynamicBreakdownRows = '';
+        Object.keys(itemsMap).forEach(key => {
+            if(itemsMap[key] > 0) {
+                const hourUnit = currentLang === "ar" ? "ساعات" : "hrs";
+                dynamicBreakdownRows += `
+                    <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; font-size: 0.9rem;">
+                        <span style="font-weight: 700; color: var(--text-main);">${key}</span>
+                        <span style="color: var(--primary); font-weight: 800;">${itemsMap[key].toFixed(2)} ${hourUnit}</span>
+                    </div>`;
+            }
+        });
+
+        const timeframeMsg = currentLang === "ar"
+            ? `في الإطار الزمني المحدد، قمت بتتبع ما مجموعه <strong style="color: var(--primary); font-size: 1.25rem;">${totalHours.toFixed(2)}</strong> ساعات.`
+            : `In this chosen timeframe, you tracked <strong style="color: var(--primary); font-size: 1.25rem;">${totalHours.toFixed(2)}</strong> total hours.`;
+
+        const matrixHeader = currentLang === "ar" ? "تفصيل مصفوفة المهام:" : "Task Matrix Breakdown:";
+
+        return `
+            <div>
+                <p style="font-size: 1.1rem; color: var(--text-main); margin: 0 0 1rem 0; font-weight: 600; line-height: 1.5;">${timeframeMsg}</p>
+                <div style="margin-top: 1rem;">
+                    <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px; font-weight: 700;">${matrixHeader}</h4>
+                    ${dynamicBreakdownRows}
+                </div>
+            </div>`;
+    }
+
+    function computeDailyAnalyticsSummary() {
+        const targetDate = document.getElementById("input_daily_date").value;
+        const viewport = document.getElementById("analyticsTerminalResponseViewport");
+        if (!targetDate) return;
+
+        let totalDailyHours = 0;
+        let dailyBreakdownMap = {};
+
+        rawHabitCollectionLedger.forEach(habit => {
+            dailyBreakdownMap[habit.name] = 0;
+            if (habit.dailyLog && Array.isArray(habit.dailyLog)) {
+                const matchLog = habit.dailyLog.find(log => log.date === targetDate);
+                if (matchLog) {
+                    const hours = parseFloat(matchLog.completedTime || 0);
+                    totalDailyHours += hours;
+                    dailyBreakdownMap[habit.name] += hours;
+                }
+            }
+        });
+
+        viewport.innerHTML = createSummaryBreakdownViewHTML(totalDailyHours, dailyBreakdownMap);
+    }
+
+    function computeWeeklyAnalyticsSummary() {
+        const targetMonth = document.getElementById("input_weekly_month").value;
+        const targetWeekIndex = parseInt(document.getElementById("input_weekly_index").value);
+        const viewport = document.getElementById("analyticsTerminalResponseViewport");
+        const currentYear = new Date().getFullYear();
+
+        let totalWeeklyHours = 0;
+        let weeklyBreakdownMap = {};
+
+        rawHabitCollectionLedger.forEach(habit => {
+            weeklyBreakdownMap[habit.name] = 0;
+            if (habit.dailyLog && Array.isArray(habit.dailyLog)) {
+                habit.dailyLog.forEach(log => {
+                    const logDateObj = new Date(log.date);
+                    if (!isNaN(logDateObj.getTime()) && logDateObj.getFullYear() === currentYear) {
+                        const formattedMonthStr = String(logDateObj.getMonth() + 1).padStart(2, '0');
+                        if (formattedMonthStr === targetMonth) {
+                            const dateDayOfMonth = logDateObj.getDate();
+                            let derivedWeekIndex = 4;
+                            
+                            if (dateDayOfMonth >= 1 && dateDayOfMonth <= 7) derivedWeekIndex = 1;
+                            else if (dateDayOfMonth >= 8 && dateDayOfMonth <= 14) derivedWeekIndex = 2;
+                            else if (dateDayOfMonth >= 15 && dateDayOfMonth <= 21) derivedWeekIndex = 3;
+
+                            if (derivedWeekIndex === targetWeekIndex) {
+                                const hours = parseFloat(log.completedTime || 0);
+                                totalWeeklyHours += hours;
+                                weeklyBreakdownMap[habit.name] += hours;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        viewport.innerHTML = createSummaryBreakdownViewHTML(totalWeeklyHours, weeklyBreakdownMap);
+    }
+
+    function computeMonthlyAnalyticsSummary() {
+        const targetMonth = document.getElementById("input_monthly_select").value;
+        const viewport = document.getElementById("analyticsTerminalResponseViewport");
+        const currentYear = new Date().getFullYear();
+
+        let totalMonthlyHours = 0;
+        let monthlyBreakdownMap = {};
+
+        rawHabitCollectionLedger.forEach(habit => {
+            monthlyBreakdownMap[habit.name] = 0;
+            if (habit.dailyLog && Array.isArray(habit.dailyLog)) {
+                habit.dailyLog.forEach(log => {
+                    const logDateObj = new Date(log.date);
+                    if (!isNaN(logDateObj.getTime()) && logDateObj.getFullYear() === currentYear) {
+                        const formattedMonthStr = String(logDateObj.getMonth() + 1).padStart(2, '0');
+                        if (formattedMonthStr === targetMonth) {
+                            const hours = parseFloat(log.completedTime || 0);
+                            totalMonthlyHours += hours;
+                            monthlyBreakdownMap[habit.name] += hours;
+                        }
+                    }
+                });
+            }
+        });
+
+        viewport.innerHTML = createSummaryBreakdownViewHTML(totalMonthlyHours, monthlyBreakdownMap);
+    }
+
+    function computeYearlyAnalyticsSummary() {
+        const viewport = document.getElementById("analyticsTerminalResponseViewport");
+        const currentYear = new Date().getFullYear();
+
+        let totalYearlyHours = 0;
+        let yearlyBreakdownMap = {};
+
+        rawHabitCollectionLedger.forEach(habit => {
+            yearlyBreakdownMap[habit.name] = 0;
+            if (habit.dailyLog && Array.isArray(habit.dailyLog)) {
+                habit.dailyLog.forEach(log => {
+                    const logDateObj = new Date(log.date);
+                    if (!isNaN(logDateObj.getTime()) && logDateObj.getFullYear() === currentYear) {
+                        const hours = parseFloat(log.completedTime || 0);
+                        totalYearlyHours += hours;
+                        yearlyBreakdownMap[habit.name] += hours;
+                    }
+                });
+            }
+        });
+
+        viewport.innerHTML = createSummaryBreakdownViewHTML(totalYearlyHours, yearlyBreakdownMap);
+    }
+</script>
 
 <%- include('partials/footer') %>

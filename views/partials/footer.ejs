@@ -1,6 +1,16 @@
 </main>
 </div> 
 
+    <div id="globalTimelineToolbar" class="global-timeline-toolbar hidden-overlay">
+        <div class="global-timeline-meta">
+            <span id="globalSessionStatus">Focus Session</span>
+            <span id="globalTimelineCompletionPercent" class="pct-pill">Completion: 0%</span>
+        </div>
+        <div class="global-timeline-track" id="globalTimelineTrack">
+            <div class="timeline-indicator-arrow" id="globalTimelineIndicator"></div>
+        </div>
+    </div>
+
     <div id="miniTimerOverlay" class="mini-timer-bar hidden-overlay">
         <div class="mini-timer-content">
             <div class="mini-status-block">
@@ -19,13 +29,22 @@
         <p>&copy; <%= new Date().getFullYear() %> <strong>DevMoor</strong>. All rights reserved.</p>
     </footer>
 
-    <script>
-        (function() {
-            const savedThemeMapping = localStorage.getItem("theme") || "dark";
-            document.documentElement.setAttribute("data-theme", savedThemeMapping);
-        })();
-    </script>
-
+    <div id="timerMilestoneModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px); z-index: 999999; justify-content: center; align-items: center;">
+        <div class="card" style="max-width: 450px; width: 92%; text-align: center; padding: 2.5rem 2rem; border-radius: 14px; background-color: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow);">
+            <div id="milestoneModalIcon" style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+            <h3 id="milestoneModalTitle" style="color: var(--text-main); font-weight: 800; font-size: 1.4rem; margin-bottom: 0.75rem;">Interval Finished!</h3>
+            <p id="milestoneModalMessage" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;"></p>
+            
+            <div id="milestoneInfoBox" style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;"></div>
+            
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+                <button type="button" id="milestoneConfirmBtn" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700;">Acknowledge & Proceed</button>
+                <button type="button" id="milestoneExtendBtn" class="btn" style="width: 100%; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; font-weight: 700; display: none;">Extend Current Focus Session</button>
+            </div>
+        </div>
+    </div>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/script.js"></script>
     <script src="/js/script.js"></script>
 </body>
 </html>
