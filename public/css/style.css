@@ -377,36 +377,18 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes modalSlideUpReveal {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .source-url-row {
-    display: flex; 
-    gap: 10px; 
-    align-items: center;
-    width: 100%;
+    display: flex; gap: 10px; align-items: center; width: 100%;
 }
 
 .btn-square-append {
-    padding: 0;
-    width: 44px;
-    height: 44px;
-    font-size: 1.15rem; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    border: none; 
-    font-weight: bold; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    flex-shrink: 0;
+    padding: 0; width: 44px; height: 44px; font-size: 1.15rem; 
+    border-radius: 8px; cursor: pointer; border: none; font-weight: bold; 
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
 input[type="datetime-local"]::-webkit-calendar-picker-indicator,
@@ -418,170 +400,119 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* ==========================================================================
    10. RIGHT-TO-LEFT (RTL) LIQUID DIRECTIONAL MIRROR GRAPH ARCHITECTURE
    ========================================================================== */
-html[dir="rtl"] {
-    text-align: right;
-}
+html[dir="rtl"] { text-align: right; }
+html[dir="rtl"] .nav-links a { margin-left: 0; }
+html[dir="rtl"] .timer-layout { flex-direction: row-reverse; }
+html[dir="rtl"] .timeline-segment { border-right: none; border-left: 1px solid var(--card-bg); }
+html[dir="rtl"] .timeline-segment:last-child { border-left: none; border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+html[dir="rtl"] .timeline-segment:first-of-type { border-top-right-radius: 6px; border-bottom-right-radius: 6px; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+html[dir="rtl"] .btn { flex-direction: row-reverse; }
+html[dir="rtl"] .source-url-row { flex-direction: row-reverse; }
 
-html[dir="rtl"] .nav-links a {
-    margin-left: 0;
-}
-
-html[dir="rtl"] .timer-layout {
-    flex-direction: row-reverse;
-}
-
-html[dir="rtl"] .timeline-segment {
-    border-right: none;
-    border-left: 1px solid var(--card-bg);
-}
-
-html[dir="rtl"] .timeline-segment:last-child {
-    border-left: none;
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-html[dir="rtl"] .timeline-segment:first-of-type {
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-html[dir="rtl"] .btn {
-    flex-direction: row-reverse;
-}
-
-html[dir="rtl"] .source-url-row {
-    flex-direction: row-reverse;
-}
-
+/* Desktop Hidden Components */
+.mobile-bottom-nav, .mobile-side-menu, .mobile-top-menu-btn { display: none; }
 
 /* ==========================================================================
-   11. FLUID RESPONSIVE MEDIA BREAKPOINT MATRIX
+   11. FLUID RESPONSIVE MEDIA BREAKPOINT MATRIX (APP-LIKE REWRITE)
    ========================================================================== */
 
 /* Ultra-Wide Screens & Smart TVs */
 @media screen and (min-width: 1400px) {
-    .container {
-        max-width: 1320px;
-    }
-    body {
-        font-size: 16px;
-    }
+    .container { max-width: 1320px; }
+    body { font-size: 16px; }
 }
 
 /* Medium Desktops & Standard Laptops */
 @media screen and (max-width: 1200px) {
-    .container {
-        max-width: 960px;
-        padding: 1.5rem 1rem;
-    }
+    .container { max-width: 960px; padding: 1.5rem 1rem; }
 }
 
 /* Large Tablets & Small Laptop Form Factors */
 @media screen and (max-width: 992px) {
-    .container {
-        max-width: 720px;
-    }
-    .profile-details-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1.5rem;
-    }
-    .timer-layout {
-        flex-direction: column !important;
-        align-items: stretch;
-    }
-    .settings-sidebar {
-        width: 100%;
-    }
+    .container { max-width: 720px; }
+    .profile-details-grid { grid-template-columns: 1fr !important; gap: 1.5rem; }
+    .timer-layout { flex-direction: column !important; align-items: stretch; }
+    .settings-sidebar { width: 100%; }
 }
 
-/* Medium Tablets & Mobile Landscape Viewports */
+/* --------------------------------------------------------------------------
+   MOBILE UI BRIDGE: NATIVE APP TRANSITION (Phones & Tablets)
+   -------------------------------------------------------------------------- */
 @media screen and (max-width: 768px) {
-    .container {
-        max-width: 540px;
-        padding: 1.25rem 1rem;
-    }
-    .navbar {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
-        text-align: center;
-    }
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 8px;
-    }
-    .nav-underline-indicator {
-        display: none !important; /* Hide sliding line track to prevent execution layout clips */
-    }
-    .activity-grid {
-        justify-content: center;
-    }
-    .stats-grid {
-        grid-template-columns: 1fr !important;
-    }
-}
+    /* Hide Desktop Components Safely */
+    #mainNavLinks { display: none !important; }
+    .auth-right-container { display: none !important; }
+    .main-footer { display: none !important; } 
 
-/* Smartphones & Small Portables */
-@media screen and (max-width: 576px) {
-    .container {
-        max-width: 100%;
-        padding: 1rem;
+    /* Transform Top Bar into Native App Header */
+    .navbar {
+        position: fixed; top: 0; left: 0; width: 100%; height: 60px; z-index: 1000;
+        flex-direction: row; justify-content: center !important; padding: 0 1rem;
+        border-bottom: 1px solid var(--border);
     }
-    .card {
-        padding: 1.25rem;
-        margin-bottom: 1rem;
+    .navbar .logo {
+        position: absolute; left: 50%; top: 50%;
+        transform: translate(-50%, -50%); margin: 0;
     }
+
+    /* Mobile Hamburger Trigger */
+    .mobile-top-menu-btn {
+        display: flex; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+        background: none; border: none; color: var(--text-main); cursor: pointer;
+    }
+    html[dir="rtl"] .mobile-top-menu-btn { right: auto; left: 1rem; }
+
+    /* The Fixed Bottom Navigation Bar */
+    .mobile-bottom-nav {
+        display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+        background-color: var(--card-bg); border-top: 1px solid var(--border); z-index: 10000;
+        justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom);
+    }
+    .mobile-bottom-nav-item {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: var(--text-muted); text-decoration: none; font-size: 0.75rem; font-weight: 700; gap: 4px; width: 25%;
+    }
+    .mobile-bottom-nav-item.active { color: var(--primary); }
+    .mobile-bottom-nav-item svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Off-Canvas Mobile Settings Menu */
+    .mobile-side-menu {
+        position: fixed; top: 0; right: -100%; width: 280px; height: 100vh;
+        background-color: var(--card-bg); border-left: 1px solid var(--border);
+        z-index: 100000; transition: right 0.3s ease; display: flex; flex-direction: column;
+        padding: 2rem 1.5rem; box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    }
+    .mobile-side-menu.open { right: 0; }
+    html[dir="rtl"] .mobile-side-menu { right: auto; left: -100%; border-left: none; border-right: 1px solid var(--border); box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+    html[dir="rtl"] .mobile-side-menu.open { left: 0; }
+
+    /* Adjust Body Padding so content doesn't hide behind fixed bars */
+    .site-wrapper { padding-top: 60px; padding-bottom: 80px; }
+    .container { max-width: 100%; padding: 1.25rem 1rem; }
+
+    /* Refine Cards & Fonts for Phone Screens */
+    .card { padding: 1.25rem; margin-bottom: 1rem; }
     h1 { font-size: 1.75rem !important; }
     h2 { font-size: 1.4rem !important; }
     h3 { font-size: 1.2rem !important; }
-    
-    .timer-controls {
-        max-width: 100% !important;
-    }
-    .circle-container {
-        width: 260px !important;
-        height: 260px !important;
-    }
-    .timer-svg {
-        width: 260px !important;
-        height: 260px !important;
-    }
-    .clock-display {
-        font-size: 3.25rem !important;
-    }
-    /* Enforce date/datetime field optimization layers */
-    input[type="date"], input[type="datetime-local"], select {
-        width: 100% !important;
-    }
-}
+    .stats-grid { grid-template-columns: 1fr !important; }
 
-/* Micro Devices & Narrow Displays */
-@media screen and (max-width: 400px) {
-    .nav-links {
-        flex-direction: column;
-        width: 100%;
+    /* 365 Github Ledger: Native Horizontal Scroll Conversion */
+    .activity-grid {
+        flex-direction: column; flex-wrap: wrap; height: 124px; gap: 4px; width: max-content; align-content: flex-start;
     }
-    .nav-item {
-        width: 100%;
-        justify-content: center;
-        padding: 0.65rem;
+    .activity-grid-wrapper {
+        overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px;
     }
-    .theme-switch-container, .lang-switch-container {
-        margin: 8px 0 !important;
+
+    /* Push the Active Timer Modules to sit directly above the Bottom Nav Bar */
+    .global-timeline-toolbar, .mini-timer-bar {
+        position: fixed !important; bottom: 70px !important; width: 100% !important; left: 0 !important;
+        z-index: 9999 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; margin: 0 !important;
     }
-    .source-url-row {
-        flex-direction: column !important;
-        align-items: stretch;
-        gap: 6px;
-    }
-    .btn-square-append {
-        width: 100%;
-        height: 38px;
-    }
+    
+    /* Optimize inputs */
+    input[type="date"], input[type="datetime-local"], select { width: 100% !important; }
+    .timer-controls, .circle-container, .timer-svg { max-width: 100% !important; }
+    .clock-display { font-size: 3.25rem !important; }
 }

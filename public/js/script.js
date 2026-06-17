@@ -20,6 +20,12 @@ function closeDeleteModal() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const currentUrlPath = window.location.pathname.toLowerCase();
+  const isAuthRoute =
+    currentUrlPath.includes("/login") ||
+    currentUrlPath.includes("/register") ||
+    currentUrlPath.includes("/auth");
+
   const isTimerPage = window.location.pathname === "/timer";
   const isDashboardPage = window.location.pathname === "/";
 
@@ -73,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
         summaryOutputGrid.innerHTML += cardHtml;
       });
 
-      // Retrigger localized definitions overlay injection cleanly if loaded
       if (typeof window.applyClientTranslationsScope === "function") {
         window.applyClientTranslationsScope();
       }
@@ -90,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const startBtn = document.getElementById("startBtn");
   const resetBtn = document.getElementById("resetBtn");
 
-  // Dual-target Timeline Elements
   const localTrack = document.getElementById("localTimelineTrack");
   const localIndicator = document.getElementById("localTimelineIndicator");
   const globalTrack = document.getElementById("globalTimelineTrack");
@@ -134,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const sessionInput = document.getElementById("sessions");
   const habitSelect = document.getElementById("habitSelect");
 
-  // Read config properties securely across any endpoint
   let savedW = parseInt(localStorage.getItem("tm_customWork")) || 25;
   let savedB = parseInt(localStorage.getItem("tm_customBreak")) || 3;
   let savedR = parseInt(localStorage.getItem("tm_customSessions")) || 3;
@@ -288,11 +291,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderTimelineSegments() {
+    if (isAuthRoute) return;
     populateTrackSegments(localTrack, localIndicator);
     populateTrackSegments(globalTrack, globalIndicator);
   }
 
   function syncTimerState() {
+    // Client short-circuit guard prevents cached running state from popping overlays up on login/register cards
+    if (isAuthRoute) {
+      if (globalTimelineToolbar)
+        globalTimelineToolbar.classList.add("hidden-overlay");
+      const miniTimerOverlay = document.getElementById("miniTimerOverlay");
+      if (miniTimerOverlay) miniTimerOverlay.classList.add("hidden-overlay");
+      return;
+    }
+
     const isRunning = localStorage.getItem("tm_runningStateActive") === "1";
     const isWork = localStorage.getItem("tm_isWorkSession") !== "false";
     const activeLang = localStorage.getItem("language") || "en";
@@ -322,7 +335,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isExtensionModeActive) computedLabel = "Extended Focus";
     if (isForcedBreakModeActive) computedLabel = "Forced Break Session";
 
-    // Translation mapping rules inject logic
     if (activeLang === "ar") {
       if (isWork) computedLabel = "جلسة التركيز";
       else computedLabel = "جلسة الاستراحة";
@@ -607,8 +619,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Universal continuous execution loop across all pages
   if (
-    localStorage.getItem("tm_runningStateActive") === "1" ||
-    parseInt(localStorage.getItem("tm_timeLeft")) > 0
+    !isAuthRoute &&
+    (localStorage.getItem("tm_runningStateActive") === "1" ||
+      parseInt(localStorage.getItem("tm_timeLeft")) > 0)
   ) {
     renderTimelineSegments();
     syncTimerState();

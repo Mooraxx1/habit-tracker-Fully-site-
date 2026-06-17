@@ -1,29 +1,38 @@
 </main>
 </div> 
 
-    <div id="globalTimelineToolbar" class="global-timeline-toolbar hidden-overlay">
-        <div class="global-timeline-meta">
-            <span id="globalSessionStatus">Focus Session</span>
-            <span id="globalTimelineCompletionPercent" class="pct-pill">Completion: 0%</span>
-        </div>
-        <div class="global-timeline-track" id="globalTimelineTrack">
-            <div class="timeline-indicator-arrow" id="globalTimelineIndicator"></div>
-        </div>
-    </div>
+    <% 
+        let isAuthView = false;
+        if (typeof title !== 'undefined' && (title === 'Login' || title === 'Register' || title === 'login' || title === 'register')) {
+            isAuthView = true;
+        }
+    %>
 
-    <div id="miniTimerOverlay" class="mini-timer-bar hidden-overlay">
-        <div class="mini-timer-content">
-            <div class="mini-status-block">
-                <span id="miniSessionStatus">Focus Time!</span>
-                <span class="mini-divider">|</span>
-                <strong id="miniTimeDisplay">25:00</strong>
+    <% if (!isAuthView) { %>
+        <div id="globalTimelineToolbar" class="global-timeline-toolbar hidden-overlay">
+            <div class="global-timeline-meta">
+                <span id="globalSessionStatus">Focus Session</span>
+                <span id="globalTimelineCompletionPercent" class="pct-pill">Completion: 0%</span>
             </div>
-            <div class="mini-controls-block">
-                <button class="btn btn-primary btn-small" id="miniStartBtn">Start</button>
-                <button class="btn btn-danger btn-small" id="miniResetBtn">Reset</button>
+            <div class="global-timeline-track" id="globalTimelineTrack">
+                <div class="timeline-indicator-arrow" id="globalTimelineIndicator"></div>
             </div>
         </div>
-    </div>
+
+        <div id="miniTimerOverlay" class="mini-timer-bar hidden-overlay">
+            <div class="mini-timer-content">
+                <div class="mini-status-block">
+                    <span id="miniSessionStatus">Focus Time!</span>
+                    <span class="mini-divider">|</span>
+                    <strong id="miniTimeDisplay">25:00</strong>
+                </div>
+                <div class="mini-controls-block">
+                    <button class="btn btn-primary btn-small" id="miniStartBtn">Start</button>
+                    <button class="btn btn-danger btn-small" id="miniResetBtn">Reset</button>
+                </div>
+            </div>
+        </div>
+    <% } %>
 
     <footer class="main-footer">
         <p>&copy; <%= new Date().getFullYear() %> <strong>DevMoor</strong>. All rights reserved.</p>
@@ -44,7 +53,6 @@
         </div>
     </div>
     <script src="/js/i18n.js"></script>
-    <script src="/js/script.js"></script>
     <script src="/js/script.js"></script>
 </body>
 </html>

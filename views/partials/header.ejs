@@ -17,240 +17,79 @@
         /* ==========================================================================
             GLOBAL RE-ENGINEERED NAVIGATION LAYER STYLES
            ========================================================================== */
-        .nav-links {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
+        .nav-links { position: relative; display: flex; align-items: center; }
         .nav-item {
-            position: relative;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            padding: 0.5rem 0.75rem;
-            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            user-select: none;
-            display: inline-flex;
-            align-items: center;
+            position: relative; color: var(--text-muted); text-decoration: none;
+            font-weight: 600; font-size: 0.95rem; padding: 0.5rem 0.75rem;
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+            user-select: none; display: inline-flex; align-items: center;
         }
-
-        /* Hover and Permanent Route Highlight Sync */
-        .nav-item:hover, .nav-item.active {
-            color: var(--primary) !important;
-        }
-
-        /* Animated Sliding Underline Tracker */
+        .nav-item:hover, .nav-item.active { color: var(--primary) !important; }
         .nav-underline-indicator {
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            height: 2px;
-            background-color: var(--primary);
-            border-radius: 2px;
+            position: absolute; bottom: -4px; left: 0; height: 2px;
+            background-color: var(--primary); border-radius: 2px;
             transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
         }
-
-        /* Smooth Dropdown Animation & Hitbox Bridging */
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
+        .profile-dropdown { position: relative; display: inline-block; }
         .dropdown-content {
-            display: block;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: var(--card-bg);
-            min-width: 190px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            border-radius: 8px;
-            z-index: 99999;
-            border: 1px solid var(--border);
-            margin-top: 12px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
-                        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
-                        visibility 0.25s linear;
-            overflow: hidden;
+            display: block; position: absolute; right: 0; top: 100%;
+            background-color: var(--card-bg); min-width: 190px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); border-radius: 8px; z-index: 99999;
+            border: 1px solid var(--border); margin-top: 12px; opacity: 0;
+            visibility: hidden; transform: translateY(-10px);
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.25s linear; overflow: hidden;
         }
-
-        /* Hitbox bridge prevents dropdown from closing during cursor transit */
-        .dropdown-content::before {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: 0;
-            width: 100%;
-            height: 15px;
+        .dropdown-content::before { content: ''; position: absolute; top: -15px; left: 0; width: 100%; height: 15px; }
+        .profile-dropdown:hover .dropdown-content, .profile-dropdown.forced-open .dropdown-content {
+            opacity: 1; visibility: visible; transform: translateY(0);
         }
-
-        .profile-dropdown:hover .dropdown-content,
-        .profile-dropdown.forced-open .dropdown-content {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
         .dropdown-content a {
-            display: block;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            font-weight: 500;
+            display: block; padding: 12px 16px; text-decoration: none;
+            color: var(--text-main); font-size: 0.95rem; font-weight: 500;
             transition: background-color 0.2s ease, color 0.2s ease;
         }
-
-        .dropdown-content a:hover {
-            background-color: var(--bg-color);
-            color: var(--primary);
-        }
-
-        /* Highlighted & Animated Tutorial Link Configurations */
+        .dropdown-content a:hover { background-color: var(--bg-color); color: var(--primary); }
         .dropdown-content a.tutorial-nav-link {
-            color: var(--primary) !important;
-            font-weight: 800 !important;
-            letter-spacing: 0.2px;
+            color: var(--primary) !important; font-weight: 800 !important; letter-spacing: 0.2px;
             text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
-            transition: text-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        letter-spacing 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: text-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), letter-spacing 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .dropdown-content a.tutorial-nav-link:hover {
-            background-color: var(--bg-color);
-            letter-spacing: 0.4px;
+            background-color: var(--bg-color); letter-spacing: 0.4px;
             text-shadow: 0 0 8px var(--primary), 0 0 18px var(--primary);
         }
-
-        /* Rounded Radio Switch Theme Slider Button */
         .theme-switch-container {
-            display: flex;
-            align-items: center;
-            background-color: var(--border);
-            width: 58px;
-            height: 30px;
-            border-radius: 20px;
-            padding: 3px;
-            cursor: pointer;
-            position: relative;
-            user-select: none;
-            margin-left: 15px;
-            transition: background-color 0.3s ease;
+            display: flex; align-items: center; background-color: var(--border);
+            width: 58px; height: 30px; border-radius: 20px; padding: 3px; cursor: pointer;
+            position: relative; user-select: none; margin-left: 15px; transition: background-color 0.3s ease;
         }
-
         .theme-switch-nob {
-            width: 24px;
-            height: 24px;
-            background-color: var(--card-bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            left: 3px;
-            font-size: 0.95rem;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            width: 24px; height: 24px; background-color: var(--card-bg); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; position: absolute;
+            left: 3px; font-size: 0.95rem; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.25);
         }
-
-        html[data-theme="light"] .theme-switch-nob {
-            transform: translateX(28px);
-        }
-
-        /* Symmetric Twin Slider Language Framework Component */
+        html[data-theme="light"] .theme-switch-nob { transform: translateX(28px); }
         .lang-switch-container {
-            display: flex;
-            align-items: center;
-            background-color: var(--border);
-            width: 58px;
-            height: 30px;
-            border-radius: 20px;
-            padding: 3px;
-            cursor: pointer;
-            position: relative;
-            user-select: none;
-            margin-left: 15px;
-            transition: background-color 0.3s ease;
+            display: flex; align-items: center; background-color: var(--border);
+            width: 58px; height: 30px; border-radius: 20px; padding: 3px; cursor: pointer;
+            position: relative; user-select: none; margin-left: 15px; transition: background-color 0.3s ease;
         }
-
         .lang-switch-nob {
-            width: 24px;
-            height: 24px;
-            background-color: var(--card-bg);
-            color: var(--primary);
-            font-weight: 800;
-            font-size: 0.72rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            left: 3px;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, color 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            width: 24px; height: 24px; background-color: var(--card-bg); color: var(--primary);
+            font-weight: 800; font-size: 0.72rem; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; position: absolute; left: 3px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, color 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.25);
         }
-
-        /* Directional Spacing Logic for Authentication App Bar Sliders */
-        .nav-logout {
-            margin-left: 20px;
-            color: var(--danger);
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        /* Language Transform Switch Constraints mapping */
-        html[lang="ar"] .lang-switch-nob {
-            transform: translateX(28px);
-        }
-
-        /* RTL Specific adjustments for standard header layouts */
-        html[dir="rtl"] .dropdown-content {
-            right: auto;
-            left: 0;
-        }
-        html[dir="rtl"] .theme-switch-container,
-        html[dir="rtl"] .lang-switch-container {
-            margin-left: 0;
-            margin-right: 15px;
-        }
-        html[dir="rtl"] .nav-logout {
-            margin-left: 0;
-            margin-right: 20px;
-        }
-
-        /* Authentication Layout Classes */
-        .navbar.auth-navbar {
-            justify-content: center;
-            position: relative;
-        }
-
-        .navbar.auth-navbar .logo {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .navbar.auth-navbar .auth-right-container {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            z-index: 10;
-        }
-        html[dir="rtl"] .navbar.auth-navbar .auth-right-container {
-            margin-left: 0;
-            margin-right: auto;
-        }
+        .nav-logout { margin-left: 20px; color: var(--danger); font-weight: 700; text-decoration: none; font-size: 0.95rem; display: inline-flex; align-items: center; }
+        html[lang="ar"] .lang-switch-nob { transform: translateX(28px); }
+        html[dir="rtl"] .dropdown-content { right: auto; left: 0; }
+        html[dir="rtl"] .theme-switch-container, html[dir="rtl"] .lang-switch-container { margin-left: 0; margin-right: 15px; }
+        html[dir="rtl"] .nav-logout { margin-left: 0; margin-right: 20px; }
+        .navbar.auth-navbar { justify-content: center; position: relative; }
+        .navbar.auth-navbar .logo { position: absolute; left: 50%; transform: translateX(-50%); }
+        .navbar.auth-navbar .auth-right-container { margin-left: auto; display: flex; align-items: center; z-index: 10; }
+        html[dir="rtl"] .navbar.auth-navbar .auth-right-container { margin-left: 0; margin-right: auto; }
     </style>
 </head>
 <body>
@@ -271,6 +110,53 @@
                 isAuthPage = true;
             }
         %>
+        
+        <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" style="display:none;position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.6);backdrop-filter:blur(2px);z-index:99990;"></div>
+        
+        <% if (!isAuthPage) { %>
+            <div class="mobile-side-menu" id="mobileSideMenu">
+                <button id="closeMobileMenu" style="background:none;border:none;color:var(--text-muted);font-size:2rem;align-self:flex-end;cursor:pointer;margin-bottom:1rem;">&times;</button>
+                <h3 style="margin-bottom: 2rem; color: var(--primary);" data-i18n="nav_settings">Settings</h3>
+                <a href="/settings/profile" style="color:var(--text-main);text-decoration:none;margin-bottom:1.5rem;font-weight:700;font-size:1.1rem;" data-i18n="drop_profile">My Profile</a>
+                <a href="/settings/account" style="color:var(--text-main);text-decoration:none;margin-bottom:1.5rem;font-weight:700;font-size:1.1rem;" data-i18n="drop_account">Account Settings</a>
+                <a href="/settings/tutorial" style="color:var(--primary);text-decoration:none;margin-bottom:2.5rem;font-weight:800;font-size:1.1rem;" data-i18n="drop_tutorial">App Tutorial</a>
+                
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 2rem; border-top:1px solid var(--border); padding-top: 2rem;">
+                    <span style="font-weight:700; color:var(--text-main);">Theme Color</span>
+                    <div class="theme-switch-container mobile-theme-switch" id="mobileThemeToggle">
+                        <div class="theme-switch-nob" id="mobileThemeNob">🌙</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: auto;">
+                    <span style="font-weight:700; color:var(--text-main);">Language</span>
+                    <div class="lang-switch-container mobile-lang-switch" id="mobileLangToggle">
+                        <div class="lang-switch-nob" id="mobileLangNob">EN</div>
+                    </div>
+                </div>
+
+                <a href="/auth/logout" style="display:block;text-align:center;background:rgba(239,68,68,0.1);color:var(--danger);text-decoration:none;font-weight:700;padding:14px;border-radius:8px;margin-top:2rem;" data-i18n="nav_logout">Logout</a>
+            </div>
+            
+            <div class="mobile-bottom-nav">
+                <a href="/" class="mobile-bottom-nav-item" id="mbNavDashboard">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span data-i18n="nav_dashboard">Dashboard</span>
+                </a>
+                <a href="/manage" class="mobile-bottom-nav-item" id="mbNavManage">
+                    <svg viewBox="0 0 24 24"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
+                    <span data-i18n="nav_manage">Manage</span>
+                </a>
+                <a href="/timer" class="mobile-bottom-nav-item" id="mbNavTimer">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span data-i18n="nav_timer">Timer</span>
+                </a>
+                <a href="/diary" class="mobile-bottom-nav-item" id="mbNavDiary">
+                    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    <span data-i18n="nav_diary">Diary</span>
+                </a>
+            </div>
+        <% } %>
+
         <nav class="navbar <%= isAuthPage ? 'auth-navbar' : '' %>">
             <div class="logo">
                 <a href="/" data-i18n="app_brand_logo_title">The Habiter</a>
@@ -304,6 +190,14 @@
                     
                     <a href="/auth/logout" class="nav-logout" data-i18n="nav_logout">Logout</a>
                 </div>
+
+                <button class="mobile-top-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
             <% } else { %>
                 <div class="auth-right-container">
                     <div class="theme-switch-container" id="themeToggleSlider" title="Toggle Display Color Mode">
@@ -319,6 +213,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+    // ---- Existing Desktop Nav Logic ----
     const navLinksContainer = document.getElementById("mainNavLinks");
     const indicator = document.getElementById("navIndicator");
     const items = document.querySelectorAll(".nav-item");
@@ -330,9 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!element || !indicator) return;
             const containerRect = navLinksContainer.getBoundingClientRect();
             const elementRect = element.getBoundingClientRect();
-            
             let leftOffset = elementRect.left - containerRect.left;
-            
             indicator.style.left = `${leftOffset}px`;
             indicator.style.width = `${elementRect.width}px`;
         }
@@ -342,7 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         items.forEach(item => {
             const hrefAttr = item.getAttribute("href");
-            
             if (hrefAttr && hrefAttr === currentPath) {
                 item.classList.add("active");
                 fallbackActive = item;
@@ -350,7 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 profileTabAnchor.classList.add("active");
                 fallbackActive = profileTabAnchor;
             }
-
             item.addEventListener("mouseenter", (e) => moveIndicator(e.target));
         });
 
@@ -364,75 +255,108 @@ document.addEventListener("DOMContentLoaded", () => {
             e.stopPropagation();
             profileDropdownTab.classList.toggle("forced-open");
         });
-
         document.addEventListener("click", () => {
             profileDropdownTab.classList.remove("forced-open");
         });
     }
 
-    // Theme Engine Hook
+    // ---- Native App Mobile Script Logic Inject ----
+    const mPath = window.location.pathname;
+    if (mPath === '/' || mPath === '') document.getElementById('mbNavDashboard')?.classList.add('active');
+    else if (mPath.includes('/manage')) document.getElementById('mbNavManage')?.classList.add('active');
+    else if (mPath.includes('/timer')) document.getElementById('mbNavTimer')?.classList.add('active');
+    else if (mPath.includes('/diary')) document.getElementById('mbNavDiary')?.classList.add('active');
+
+    const mMenuBtn = document.getElementById('mobileMenuBtn');
+    const mSideMenu = document.getElementById('mobileSideMenu');
+    const mCloseBtn = document.getElementById('closeMobileMenu');
+    const mBackdrop = document.getElementById('mobileMenuBackdrop');
+
+    if (mMenuBtn && mSideMenu) {
+        mMenuBtn.addEventListener('click', () => {
+            mSideMenu.classList.add('open');
+            mBackdrop.style.display = 'block';
+        });
+        mCloseBtn.addEventListener('click', () => {
+            mSideMenu.classList.remove('open');
+            mBackdrop.style.display = 'none';
+        });
+        mBackdrop.addEventListener('click', () => {
+            mSideMenu.classList.remove('open');
+            mBackdrop.style.display = 'none';
+        });
+    }
+
+    // ---- Theme Engine Sync (Desktop & Mobile Links) ----
     const themeToggleSlider = document.getElementById("themeToggleSlider");
     const themeEmojiNob = document.getElementById("themeEmojiNob");
+    const mobileThemeToggle = document.getElementById("mobileThemeToggle");
+    const mobileThemeNob = document.getElementById("mobileThemeNob");
     const htmlElement = document.documentElement;
 
     function applyEmojiState(theme) {
-        if (!themeEmojiNob) return;
-        themeEmojiNob.textContent = theme === "light" ? "☀️" : "🌙";
+        if (themeEmojiNob) themeEmojiNob.textContent = theme === "light" ? "☀️" : "🌙";
+        if (mobileThemeNob) mobileThemeNob.textContent = theme === "light" ? "☀️" : "🌙";
+        if (mobileThemeToggle) {
+            mobileThemeToggle.style.backgroundColor = theme === "light" ? "#e2e8f0" : "#334155";
+        }
     }
 
     const structuralTheme = htmlElement.getAttribute("data-theme") || "dark";
     applyEmojiState(structuralTheme);
 
-    if (themeToggleSlider) {
-        themeToggleSlider.addEventListener("click", () => {
-            const activeState = htmlElement.getAttribute("data-theme");
-            const targetTheme = activeState === "dark" ? "light" : "dark";
-            
-            htmlElement.setAttribute("data-theme", targetTheme);
-            localStorage.setItem("theme", targetTheme);
-            applyEmojiState(targetTheme);
-        });
+    function toggleTheme() {
+        const activeState = htmlElement.getAttribute("data-theme");
+        const targetTheme = activeState === "dark" ? "light" : "dark";
+        htmlElement.setAttribute("data-theme", targetTheme);
+        localStorage.setItem("theme", targetTheme);
+        applyEmojiState(targetTheme);
     }
 
-    // Language Engine Interconnected Asymmetric Network Framework Sync Loop
+    if (themeToggleSlider) themeToggleSlider.addEventListener("click", toggleTheme);
+    if (mobileThemeToggle) mobileThemeToggle.addEventListener("click", toggleTheme);
+
+    // ---- Language Engine Sync (Desktop & Mobile Links) ----
     const languageToggleSlider = document.getElementById("languageToggleSlider");
     const langTextNob = document.getElementById("langTextNob");
+    const mobileLangToggle = document.getElementById("mobileLangToggle");
+    const mobileLangNob = document.getElementById("mobileLangNob");
 
     function applyLangTextState(lang) {
-        if (!langTextNob) return;
-        langTextNob.textContent = lang === "ar" ? "AR" : "EN";
+        if (langTextNob) langTextNob.textContent = lang === "ar" ? "AR" : "EN";
+        if (mobileLangNob) mobileLangNob.textContent = lang === "ar" ? "AR" : "EN";
+        if (mobileLangToggle) {
+            mobileLangToggle.style.backgroundColor = lang === "ar" ? "#e2e8f0" : "#334155";
+        }
     }
 
     const structuralLang = htmlElement.getAttribute("lang") || "en";
     applyLangTextState(structuralLang);
 
-    if (languageToggleSlider) {
-        languageToggleSlider.addEventListener("click", () => {
-            const activeLang = htmlElement.getAttribute("lang") || "en";
-            const targetLang = activeLang === "en" ? "ar" : "en";
-            
-            htmlElement.setAttribute("lang", targetLang);
-            htmlElement.setAttribute("dir", targetLang === "ar" ? "rtl" : "ltr");
-            localStorage.setItem("language", targetLang);
-            applyLangTextState(targetLang);
+    function toggleLanguage() {
+        const activeLang = htmlElement.getAttribute("lang") || "en";
+        const targetLang = activeLang === "en" ? "ar" : "en";
+        htmlElement.setAttribute("lang", targetLang);
+        htmlElement.setAttribute("dir", targetLang === "ar" ? "rtl" : "ltr");
+        localStorage.setItem("language", targetLang);
+        applyLangTextState(targetLang);
 
-            fetch("/api/profile/language", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ language: targetLang })
-            })
-            .then(() => {
-                if (typeof window.retranslatePageScope === "function") {
-                    window.retranslatePageScope(targetLang);
-                } else {
-                    window.location.reload();
-                }
-            })
-            .catch(err => {
-                console.warn("[Language Sync Sync Error]:", err.message);
-                window.location.reload();
-            });
+        fetch("/api/profile/language", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ language: targetLang })
+        })
+        .then(() => {
+            if (typeof window.retranslatePageScope === "function") window.retranslatePageScope(targetLang);
+            else window.location.reload();
+        })
+        .catch(err => {
+            console.warn("[Language Sync Sync Error]:", err.message);
+            window.location.reload();
         });
     }
+
+    if (languageToggleSlider) languageToggleSlider.addEventListener("click", toggleLanguage);
+    if (mobileLangToggle) mobileLangToggle.addEventListener("click", toggleLanguage);
 });
 </script>
